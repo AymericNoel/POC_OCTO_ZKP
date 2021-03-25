@@ -13,17 +13,27 @@ contract AdminManager{
     mapping (address=>bool) ContractAdmins; 
     address private deployer;
     string public ContactP2P;
+    uint public MinApprovals;
 
-    //proposal area
-    struct Proposal{
+    //garden proposal area
+    struct GardenProposal{
         uint32 gardenIndex;
         uint[2] secretHash;
         address[] acceptProposal;
         address[] rejectProposal;
         bool isOpen;
     }
-    mapping (uint32=>Proposal) Proposals;
-    uint public MinApprovals;
+    mapping (uint32=>GardenProposal) GardenProposals;
+    
+    //dispute proposal area
+    struct DisputeProposal{
+        uint32 gardenIndex;
+        uint ownerAmount;
+        uint tenantAmount;
+        address[] acceptProposal;
+        bool isOpen;
+    }
+    mapping(uint32=>DisputeProposal) DisputeProposals;
    
     constructor (address[] memory _contractAdmins,uint _minApprovals, address _verifierContract, string memory _contactP2P) public {
         for (uint256 index = 0; index < _contractAdmins.length; index++) {
@@ -39,8 +49,12 @@ contract AdminManager{
         require(ContractAdmins[msg.sender], "Only administrators should call");
         _;
     }
-    modifier OnlyValidProposal(uint32 _gardenIndex){
-        require(Proposals[_gardenIndex].isOpen, "Proposal should be open.");   
+    modifier OnlyValidGardenProposal(uint32 _gardenIndex){
+        require(GardenProposals[_gardenIndex].isOpen, "GardenProposal should be open.");   
+        _;   
+    }
+    modifier OnlyValidDisputeProposal(uint32 _gardenIndex){
+        require(DisputeProposals[_gardenIndex].isOpen, "DisputeProposal should be open.");   
         _;   
     }
     modifier OnlyDeployer(){
@@ -48,54 +62,98 @@ contract AdminManager{
         _;
     }
 
-    function AddGardenManagerAddress(address _address) public OnlyDeployer(){
+    function AddGardenManagerAddress(address _address) external OnlyDeployer() returns(address){
         GManager = GardenManager(_address);
+        return _address;
     }
 
-    function ModifyVerifierContractAddress(address _verifierContract) public OnlyDeployer(){
+    function GetGardenManagerAddress()external view returns(address){
+        return address(GManager);
+    }
+
+    function GetVerifierContractAddress()external view returns(address){
+        return address(VerifierContract);
+    }
+
+    function ModifyVerifierContractAddress(address _verifierContract) external OnlyDeployer(){
         VerifierContract = Verifier(_verifierContract);
         GManager.ModifyVerifierContract(_verifierContract);
     }
 
     function AddGarden(uint32 _gardenIndex, uint[2] memory _secret) public{
         require(msg.sender== address(GManager));
-        Proposal storage proposal = Proposals[_gardenIndex];
+        GardenProposal storage proposal = GardenProposals[_gardenIndex];
         proposal.gardenIndex=_gardenIndex;
         proposal.secretHash=_secret;
         proposal.isOpen=true;
     }
 
-    function AcceptGarden(uint32 _gardenIndex,uint[2] memory _proofA, uint[2][2] memory _proofB,
-            uint[2] memory _proofC) public OnlyAdmin() OnlyValidProposal(_gardenIndex){
+    function AcceptGarden(uint32 _gardenIndex,uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC) external OnlyAdmin() OnlyValidGardenProposal(_gardenIndex){
+        GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
-        for (uint256 i = 0; i < Proposals[_gardenIndex].rejectProposal.length; i++) {
-            if(Proposals[_gardenIndex].acceptProposal[i]==msg.sender){
+        for (uint256 i = 0; i < proposal.acceptProposal.length; i++) {
+            if(proposal.acceptProposal[i]==msg.sender){
                 alreadyVoted=true;
                 break;
             }
         }
         require(!alreadyVoted, "You should only vote once");
-        require(VerifierContract.verifyTx(_proofA,_proofB,_proofC,Proposals[_gardenIndex].secretHash), "Proof of secret should be valid");
-        Proposals[_gardenIndex].acceptProposal.push(msg.sender);
-        if(Proposals[_gardenIndex].acceptProposal.length==MinApprovals){
+        require(VerifierContract.verifyTx(_proofA,_proofB,_proofC,proposal.secretHash), "Proof of secret invalid");
+        proposal.acceptProposal.push(msg.sender);
+        if(proposal.acceptProposal.length==MinApprovals){
             GManager.AcceptGarden(_gardenIndex);
-            Proposals[_gardenIndex].isOpen=false;
+            proposal.isOpen=false;
         }
     }
 
-    function RejectGarden(uint32 _gardenIndex) public OnlyAdmin() OnlyValidProposal(_gardenIndex){
+    function RejectGarden(uint32 _gardenIndex) external OnlyAdmin() OnlyValidGardenProposal(_gardenIndex){
+        GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
-        for (uint256 i = 0; i < Proposals[_gardenIndex].rejectProposal.length; i++) {
-            if(Proposals[_gardenIndex].rejectProposal[i]==msg.sender){
+        for (uint256 i = 0; i < proposal.rejectProposal.length; i++) {
+            if(proposal.rejectProposal[i]==msg.sender){
                 alreadyVoted=true;
                 break;
             }
         }
         require(!alreadyVoted, "You should only vote once");
-        Proposals[_gardenIndex].rejectProposal.push(msg.sender);
-        if(Proposals[_gardenIndex].rejectProposal.length==MinApprovals){
+        proposal.rejectProposal.push(msg.sender);
+        if(proposal.rejectProposal.length==MinApprovals){
             GManager.RejectGarden(_gardenIndex);
-            Proposals[_gardenIndex].isOpen=false;
+            proposal.isOpen=false;
+        }
+    }
+
+    function AddDispute(uint32 _gardenIndex) public {
+        require(msg.sender== address(GManager));
+        DisputeProposal storage proposal = DisputeProposals[_gardenIndex];
+        proposal.gardenIndex=_gardenIndex;
+    }
+
+    function SetAmountForDispute(uint32 _gardenIndex,uint _ownerAmount, uint _tenantAmount) public OnlyDeployer() OnlyValidDisputeProposal(_gardenIndex){
+        DisputeProposal storage proposal = DisputeProposals[_gardenIndex];
+        if(proposal.acceptProposal.length !=0){
+            delete proposal.acceptProposal;
+        }
+        proposal.ownerAmount=_ownerAmount;
+        proposal.tenantAmount=_tenantAmount;
+        proposal.acceptProposal.push(msg.sender);
+    }
+
+    function AcceptDispute(uint32 _gardenIndex) external OnlyAdmin() OnlyValidDisputeProposal(_gardenIndex){
+        bool alreadyVoted =false;
+        DisputeProposal storage proposal = DisputeProposals[_gardenIndex];
+        for (uint256 i = 0; i < proposal.acceptProposal.length; i++) {
+            if(proposal.acceptProposal[i]==msg.sender){
+                alreadyVoted=true;
+                break;
+            }
+        }
+        require(!alreadyVoted, "You should only vote once");        
+        proposal.acceptProposal.push(msg.sender);
+        if(proposal.acceptProposal.length==MinApprovals){
+            GManager.CloseDispute(_gardenIndex, proposal.ownerAmount,proposal.tenantAmount);
+            proposal.isOpen=false;
         }
     }
 }

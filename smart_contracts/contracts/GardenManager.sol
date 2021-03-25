@@ -5,15 +5,14 @@ import "./AdminManager.sol";
 import "./Verifier.sol";
 
 contract GardenManager {
-
     Verifier VerifierContract;
-    AdminManager AManager;    
-    uint32 public GardenCount=0;
+    AdminManager AManager;   
+     uint32 public GardenCount=0;
 
     //garden declaration
-    mapping (uint32=>Garden) private AllGarden;
+    mapping (uint32=>Garden) public AllGarden;
     enum GardenType{Vegetable, Hobby}
-    enum Status{Waiting,Free,Blocked,CodeWaiting,Location,Blacklist}
+    enum Status{Waiting,Free,Blocked,CodeWaiting,Location,Blacklist,Dispute}
     struct Garden{
         address payable owner;
         bool multipleOwners;
@@ -44,31 +43,32 @@ contract GardenManager {
         AManager = AdminManager(_adminContract);
         VerifierContract = Verifier(_verifierContract);
     }
-
-    modifier OnlyContractAdmin(){
-        require(msg.sender == address(AManager), "Only administrator contract should call.");
-        _;
+    
+    function OnlyContractAdmin()private view{
+        require(msg.sender == address(AManager), "Not administrator contract");
     }
-    modifier OnlyFreeGarden(uint32 gardenIndex){
-        require(AllGarden[gardenIndex].status==Status.Free, "Garden should be free.");
-        _;
-    }
+    
     modifier OnlyOwner(uint32 gardenIndex){
-        require(AllGarden[gardenIndex].owner==msg.sender, "Only garden owner should call");
+        require(AllGarden[gardenIndex].owner==msg.sender, "Not garden owner");
         _;
     }
     modifier OnlyValidProof(uint32 _gardenIndex, uint[2] memory _proofA, uint[2][2] memory _proofB,
             uint[2] memory _proofC){
-                require(VerifierContract.verifyTx(_proofA,_proofB,_proofC,AllGarden[_gardenIndex].secretHash), "Proof of secret should be valid");
-                _;
-            }
+        require(VerifierContract.verifyTx(_proofA,_proofB,_proofC,AllGarden[_gardenIndex].secretHash), "Proof of secret invalid");
+        _;
+    }
 
-    function ModifyVerifierContract(address _verifierContract) public OnlyContractAdmin() returns(address){
+    function GetVerifierContractAddress()external view returns(address){
+        return address(VerifierContract);
+    }
+    
+    function ModifyVerifierContract(address _verifierContract) public  returns(address){
+        OnlyContractAdmin();
         VerifierContract = Verifier(_verifierContract);
         return _verifierContract;
     }
 
-    function CreateGarden(uint[2] memory _secretHash, string memory _district,uint32 _area, string memory _contact, GardenType _gardenType, bool _multipleOwners, address payable[] memory _coOwners) public returns(uint32 index){
+    function CreateGarden(uint[2] calldata _secretHash, string calldata _district,uint32 _area, string calldata _contact, GardenType _gardenType, bool _multipleOwners, address payable[] calldata _coOwners) external returns(uint32 index){
         Garden storage garden = AllGarden[GardenCount];
         garden.area=_area;
         garden.contact=_contact;
@@ -86,37 +86,33 @@ contract GardenManager {
         return (GardenCount-1);
     }
 
-    function UpdateGardenContact(uint32 _gardenIndex, string memory _contact) public OnlyOwner(_gardenIndex) {
+    function UpdateGardenContact(uint32 _gardenIndex, string calldata _contact) external OnlyOwner(_gardenIndex) {
         AllGarden[_gardenIndex].contact =_contact;
     }
 
-    function UpdateGardenSecretHash(uint32 _gardenIndex, uint[2] memory _proofA, uint[2][2] memory _proofB,
-            uint[2] memory _proofC, uint[2] memory _newSecretHash) public OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
+    function UpdateGardenSecretHash(uint32 _gardenIndex, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC, uint[2] calldata _newSecretHash) external OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
         AllGarden[_gardenIndex].secretHash =_newSecretHash;
     }
 
-    function AcceptGarden(uint32 _gardenIndex) public OnlyContractAdmin() {
+    function AcceptGarden(uint32 _gardenIndex) public  {
+        OnlyContractAdmin();
         AllGarden[_gardenIndex].status= Status.Free;
     }
 
-    function RejectGarden(uint32 _gardenIndex) public OnlyContractAdmin() {
+    function RejectGarden(uint32 _gardenIndex) public  {
+        OnlyContractAdmin();
         AllGarden[_gardenIndex].status= Status.Blacklist;
-    }    
-
-    function IsRentOver(Rent memory _rent) private view returns (bool){
-        if(_rent.beginning + _rent.duration<= block.timestamp){
-            return true;
-        }
-        return false;
-    }
+    }        
 
     function GetLastRentForGarden(uint32 _gardenIndex) private view returns(Rent storage){
         return AllGarden[_gardenIndex].rents[AllGarden[_gardenIndex].rents.length-1];
     }
 
     function ProposeGardenOffer(uint32 _gardenIndex, address payable _tenant, 
-    uint256 _rentingDuration, uint _price, uint[2] memory _proofA, uint[2][2] memory _proofB,
-            uint[2] memory _proofC) public OnlyFreeGarden(_gardenIndex) OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
+    uint256 _rentingDuration, uint _price, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC) external OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
+        require(AllGarden[_gardenIndex].status==Status.Free, "Garden not free");
         Garden storage garden = AllGarden[_gardenIndex];        
         garden.status= Status.Blocked;
         garden.rents.push();
@@ -128,26 +124,26 @@ contract GardenManager {
         lastRent.rate=-1;
     }
 
-    function DeleteGardenOffer(uint32 _gardenIndex, uint[2] memory _proofA, uint[2][2] memory _proofB,
-            uint[2] memory _proofC) public OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
-        require(AllGarden[_gardenIndex].status== Status.Blocked,"There is no offer running");
+    function DeleteGardenOffer(uint32 _gardenIndex, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC) external OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
+        require(AllGarden[_gardenIndex].status== Status.Blocked,"No offer running");
         AllGarden[_gardenIndex].status= Status.Free;
         AllGarden[_gardenIndex].rents.pop(); //can be very costly, have to be tested
     }
 
-    function AcceptGardenOffer(uint32 _gardenIndex)public payable{
+    function AcceptGardenOffer(uint32 _gardenIndex)external payable{
         Garden storage garden = AllGarden[_gardenIndex];
         Rent storage lastRent = GetLastRentForGarden(_gardenIndex);
-        require(garden.status== Status.Blocked, "Garden should be block for user");
-        require(lastRent.tenant== msg.sender, "Should be the correct tenant public key");
-        require(lastRent.price <= msg.value, "Amount for rents insufficient");
+        require(garden.status== Status.Blocked, "No offer running");
+        require(lastRent.tenant== msg.sender, "Not the correct tenant");
+        require(lastRent.price <= msg.value, "Insufficient amount");
         lastRent.balance=msg.value;
         garden.status=Status.CodeWaiting;
     }
 
     function AddAccessCodeToGarden(uint32 _gardenIndex, uint[2] memory _proofA, uint[2][2] memory _proofB,
             uint[2] memory _proofC, string memory _hashCode,string memory _encryptedCode) public OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
-        require(AllGarden[_gardenIndex].status==Status.CodeWaiting,"Can't add code if no location");
+        require(AllGarden[_gardenIndex].status==Status.CodeWaiting,"No location running");
         Garden storage garden = AllGarden[_gardenIndex];
         Rent storage lastRent = GetLastRentForGarden(_gardenIndex);
         lastRent.beginning=block.timestamp;        
@@ -155,32 +151,42 @@ contract GardenManager {
         garden.status=Status.Location;
     }
 
-    function GetRefundBeforeLocation(uint32 _gardenIndex) public {
+    function GetRefundBeforeLocation(uint32 _gardenIndex) external {
         require(AllGarden[_gardenIndex].status==Status.CodeWaiting,"Code is not missing");
         Rent storage lastRent = GetLastRentForGarden(_gardenIndex);
-        require(lastRent.tenant==msg.sender,"Can't refund if you're not the tenant");
+        require(lastRent.tenant==msg.sender,"Not the tenant");
         msg.sender.transfer(lastRent.balance);
         AllGarden[_gardenIndex].status=Status.Free;
     }
-
-    function UpdateLocationStatusAndGetPayment(uint32 _gardenIndex, uint[2] memory _proofA, uint[2][2] memory _proofB,
-            uint[2] memory _proofC)public OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
+    function TransferPaymentToMultipleOwners(uint _amount, Garden memory _garden) internal {
+        for (uint256 i = 0; i < _garden.coOwners.length; i++) {
+            _garden.coOwners[i].transfer(_amount);
+        }
+    }
+    function IsRentOver(Rent memory _rent) internal view returns (bool){
+        if(_rent.beginning + _rent.duration<= block.timestamp){
+            return true;
+        }
+        return false;
+    }
+    function UpdateLocationStatusAndGetPayment(uint32 _gardenIndex, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC)external OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
         Rent storage lastRent = GetLastRentForGarden(_gardenIndex);
         Garden storage garden = AllGarden[_gardenIndex];
-        require(IsRentOver(lastRent),"Can't withdraw ether before the end of location");
+        require(garden.status!= Status.Dispute, "Dispute is running");
+        require(IsRentOver(lastRent),"Location not over");
         if(garden.multipleOwners){
-            uint payroll = lastRent.balance/garden.coOwners.length;
-            for (uint256 i = 0; i < garden.coOwners.length; i++) {
-                garden.coOwners[i].transfer(payroll);
-            }
+            uint256 payroll = lastRent.balance/garden.coOwners.length;
+            TransferPaymentToMultipleOwners(payroll,garden);    
         }else{
             garden.owner.transfer(lastRent.balance);
         }
+        lastRent.balance=0;
         lastRent.accessCode.hashCode="";
         AllGarden[_gardenIndex].status=Status.Free;
-    }
+    }    
 
-    function AddGradeToGarden(uint32 _gardenIndex,int _grade)public returns(bool saved){
+    function AddGradeToGarden(uint32 _gardenIndex,int _grade)external returns(bool saved){
         require(_grade<6 && _grade >=0, "Grade is not in range 0-5");
         saved=false;
         Rent[] storage allRents = AllGarden[_gardenIndex].rents;
@@ -193,26 +199,37 @@ contract GardenManager {
         return saved;
     }
 
-    function GetGardenById(uint32 _gardenIndex)external view returns(address payable,bool, address payable[] memory, GardenType,string memory, uint32 , string memory, Status, Rent[] memory){
-        Garden memory garden = AllGarden[_gardenIndex];
-        return(
-            garden.owner,
-            garden.multipleOwners,
-            garden.coOwners,
-            garden.gardenType,
-            garden.district,
-            garden.area,
-            garden.contact,
-            garden.status,
-            garden.rents
-        );
-    }
-
     function GetEncryptedAccessCodeForGarden(uint32 _gardenIndex)external view returns(string memory) {
         Rent memory lastRent = GetLastRentForGarden(_gardenIndex);
-        require(lastRent.tenant==msg.sender,"Can't access to code if you're not the tenant");
+        require(lastRent.tenant==msg.sender,"Not the tenant");
         return lastRent.accessCode.encryptedCode;
     }
+
+    function AddDispute(uint32 _gardenIndex) public {
+        Rent memory lastRent = GetLastRentForGarden(_gardenIndex);
+        require(lastRent.tenant==msg.sender || AllGarden[_gardenIndex].owner==msg.sender,"Not the tenant nor the owner");
+        AllGarden[_gardenIndex].status = Status.Dispute;
+        AManager.AddDispute(_gardenIndex);
+    }
+
+    function CloseDispute(uint32 _gardenIndex, uint _ownerAmount, uint _tenantAmount) public {
+        OnlyContractAdmin();
+        Garden storage garden = AllGarden[_gardenIndex];    
+        require(garden.status==Status.Dispute, "No dispute running"); 
+        Rent memory lastRent = GetLastRentForGarden(_gardenIndex);   
+        if(_tenantAmount!=0){
+            lastRent.tenant.transfer(_tenantAmount);
+        }
+        if(_ownerAmount!=0){
+                if(garden.multipleOwners){
+                uint256 payroll = _ownerAmount/garden.coOwners.length;
+                TransferPaymentToMultipleOwners(payroll,garden);   
+            }else{
+                garden.owner.transfer(_ownerAmount);
+            }
+        }        
+        lastRent.balance=0;
+        lastRent.accessCode.hashCode="";
+        garden.status=Status.Free;
+    }
 }
-//ouverture litige :
-//une fonction pour bloquer export eth, une pour redonner les ethers aux bonnes personnes et/ou modifier duree loc
