@@ -35,6 +35,7 @@ contract AdminManager{
         uint balance;
         address[] acceptProposal;
         bool isOpen;
+        bool isReady;
     }
     mapping(uint=>DisputeProposal) public DisputeProposals;
    
@@ -56,8 +57,8 @@ contract AdminManager{
         require(GardenProposals[_gardenIndex].isOpen, "GardenProposal should be open.");   
         _;   
     }
-    modifier OnlyValidDisputeProposal(uint _disputeIndex){
-        require(DisputeProposals[_disputeIndex].isOpen, "DisputeProposal should be open.");   
+    modifier OnlyOpenDisputeProposal(uint _disputeIndex){
+        require(DisputeProposals[_disputeIndex].isOpen, "DisputeProposal should be open."); 
         _;   
     }
     modifier OnlyDeployer(){
@@ -82,17 +83,14 @@ contract AdminManager{
 
     function AddGarden(uint _gardenIndex, uint[2] memory _secret) public{
         require(msg.sender== address(GManager));
-        GardenProposal storage proposal = GardenProposals[_gardenIndex];
-        proposal.gardenIndex=_gardenIndex;
-        proposal.secretHash=_secret;
-        proposal.isOpen=true;
+        GardenProposals[_gardenIndex] = GardenProposal(_gardenIndex,_secret,new address[](0),new address[](0),true);
     }
 
     function AcceptGarden(uint _gardenIndex,uint[2] calldata _proofA, uint[2][2] calldata _proofB,
             uint[2] calldata _proofC) external OnlyAdmin() OnlyValidGardenProposal(_gardenIndex){
         GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
-        for (uint256 i = 0; i < proposal.acceptProposal.length; i++) {
+        for (uint i = 0; i < proposal.acceptProposal.length; i++) {
             if(proposal.acceptProposal[i]==msg.sender){
                 alreadyVoted=true;
                 break;
@@ -126,15 +124,12 @@ contract AdminManager{
 
     function AddDispute(uint _gardenIndex,uint _gardenBalance) public {
         require(msg.sender== address(GManager));
-        DisputeProposal storage proposal = DisputeProposals[disputeProposalsCount];
-        proposal.gardenIndex=_gardenIndex;
-        proposal.balance=_gardenBalance;
-        proposal.isOpen=true;
+        DisputeProposals[disputeProposalsCount] = DisputeProposal(_gardenIndex,0,0,_gardenBalance,new address[](0),true,false);
         emit newDispute(disputeProposalsCount);
         disputeProposalsCount++;
     }
 
-    function SetAmountForDispute(uint _disputeIndex,uint _ownerAmount, uint _tenantAmount) public OnlyDeployer() OnlyValidDisputeProposal(_disputeIndex){
+    function SetAmountForDispute(uint _disputeIndex,uint _ownerAmount, uint _tenantAmount) public OnlyDeployer() OnlyOpenDisputeProposal(_disputeIndex){
         DisputeProposal storage proposal = DisputeProposals[_disputeIndex];
         require(_ownerAmount+_tenantAmount==proposal.balance,"Incorrect amounts");
         if(proposal.acceptProposal.length !=0){
@@ -142,12 +137,14 @@ contract AdminManager{
         }
         proposal.ownerAmount=_ownerAmount;
         proposal.tenantAmount=_tenantAmount;
+        proposal.isReady=true;
         proposal.acceptProposal.push(msg.sender);
     }
 
-    function AcceptDispute(uint _disputeIndex) external OnlyAdmin() OnlyValidDisputeProposal(_disputeIndex){
-        bool alreadyVoted =false;
-        DisputeProposal storage proposal = DisputeProposals[_disputeIndex];
+    function AcceptDispute(uint _disputeIndex) external OnlyAdmin() OnlyOpenDisputeProposal(_disputeIndex){
+        DisputeProposal storage proposal = DisputeProposals[_disputeIndex]; 
+        require(proposal.isReady,"Amounts not set"); 
+        bool alreadyVoted =false; 
         for (uint i = 0; i < proposal.acceptProposal.length; i++) {
             if(proposal.acceptProposal[i]==msg.sender){
                 alreadyVoted=true;
