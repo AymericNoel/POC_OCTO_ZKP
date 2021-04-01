@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.8.0;
+pragma solidity ^0.6.1;
+
 library GLibrary{
     enum GardenType{Vegetable, Hobby}
     enum Status{Waiting,Free,Blocked,CodeWaiting,Location,Blacklist,Dispute}
@@ -12,12 +13,12 @@ library GLibrary{
         uint32 area;
         uint[2] secretHash;
         string contact;
-        Status status; 
+        Status status;
         Rent[] rents;
     }
     struct Rent{
         int rate;
-        uint duration; 
+        uint duration;
         uint price;
         uint beginning;
         uint balance;
