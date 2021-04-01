@@ -33,8 +33,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.1+commit.e6f7d5a4\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256[2]\",\"name\":\"a\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2][2]\",\"name\":\"b\",\"type\":\"uint256[2][2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"c\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"input\",\"type\":\"uint256[2]\"}],\"name\":\"verifyTx\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"r\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/Verifier.sol\":\"Verifier\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/Verifier.sol\":{\"keccak256\":\"0xfa55458ae6a89bea05b35dc3a50c7b340e8d762ab6ac9952329497ab64a47381\",\"urls\":[\"bzz-raw://f411722c3f1fa6a1da3b2292ea03578b294f43a31f547c99e826ee3aae961c5f\",\"dweb:/ipfs/Qmd7wGhfi4xwkd48hNwbEeR6UpHKZjFmtVWZ6ojBuj5c5n\"]}},\"version\":1}",
@@ -75937,8 +75936,7 @@
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-30T15:56:13.645Z",
-  "networkType": "ethereum",
+  "updatedAt": "2021-04-01T14:27:42.630Z",
   "devdoc": {
     "methods": {}
   },
