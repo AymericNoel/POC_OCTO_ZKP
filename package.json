@@ -1,0 +1,25 @@
+{
+  "name": "smart_contracts",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "npx truffle compile --all",
+    "ganache": "npx ganache-cli",
+    "lint:sol": "npx solhint",
+    "migrate": "npx truffle migrate --compile-all --reset",
+    "test:sol": "NODE_ENV=test npx truffle test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ganache-cli": "^6.12.2",
+    "solhint": "^3.3.4",
+    "solidity-docgen": "^0.5.11",
+    "truffle": "^5.3.0",
+    "truffle-assertions": "^0.9.2"
+  }
+}
