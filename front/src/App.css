@@ -1,0 +1,13 @@
+.navBarCustom {
+  margin-right: 1em;
+}
+.connect-button{
+  height: 50px;
+}
+.fa-metamask {
+  content: url("./assets/metamask.svg");
+  height: 15px;
+  width: 15px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
