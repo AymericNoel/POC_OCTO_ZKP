@@ -11,16 +11,16 @@ contract GardenManager {
     uint public GardenCount;
     mapping (uint=>GLibrary.Garden) public AllGarden;
     event newGarden(address _owner, uint _gardenIndex);
-    
+
     constructor (address _adminContract, address _verifierContract) public {
         AManager = AdminManager(_adminContract);
         VerifierContract = Verifier(_verifierContract);
     }
-    
+
     function OnlyContractAdmin()private view{
         require(msg.sender == address(AManager), "Not administrator contract");
     }
-    
+
     modifier OnlyOwner(uint gardenIndex){
         require(AllGarden[gardenIndex].owner==msg.sender, "Not garden owner");
         _;
@@ -34,11 +34,11 @@ contract GardenManager {
     function GetGardenById(uint _gardenIndex)external view returns(GLibrary.Garden memory){
         return AllGarden[_gardenIndex];
     }
-    
+
     function GetVerifierContractAddress()external view returns(address){
         return address(VerifierContract);
     }
-    
+
     function ModifyVerifierContract(address _verifierContract) public  returns(address){
         OnlyContractAdmin();
         VerifierContract = Verifier(_verifierContract);
@@ -80,17 +80,17 @@ contract GardenManager {
     function RejectGarden(uint _gardenIndex) public  {
         OnlyContractAdmin();
         AllGarden[_gardenIndex].status= GLibrary.Status.Blacklist;
-    }        
+    }
 
     function GetLastRentForGarden(uint _gardenIndex) private view returns(GLibrary.Rent storage){
         return AllGarden[_gardenIndex].rents[AllGarden[_gardenIndex].rents.length-1];
     }
 
-    function ProposeGardenOffer(uint _gardenIndex, address payable _tenant, 
+    function ProposeGardenOffer(uint _gardenIndex, address payable _tenant,
     uint _rentingDuration, uint _price, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
             uint[2] calldata _proofC) external OnlyOwner(_gardenIndex) OnlyValidProof(_gardenIndex,_proofA,_proofB,_proofC){
         require(AllGarden[_gardenIndex].status==GLibrary.Status.Free, "Garden not free");
-        GLibrary.Garden storage garden = AllGarden[_gardenIndex];        
+        GLibrary.Garden storage garden = AllGarden[_gardenIndex];
         garden.status= GLibrary.Status.Blocked;
         garden.rents.push();
         GLibrary.Rent storage lastRent = GetLastRentForGarden(_gardenIndex);
@@ -149,7 +149,7 @@ contract GardenManager {
         require(GLibrary.IsRentOver(lastRent.beginning,lastRent.duration),"Location not over");
         if(garden.multipleOwners){
             uint payroll = lastRent.balance/garden.coOwners.length;
-            TransferPaymentToMultipleOwners(payroll,garden);    
+            TransferPaymentToMultipleOwners(payroll,garden);
         }else{
             garden.owner.transfer(lastRent.balance);
         }

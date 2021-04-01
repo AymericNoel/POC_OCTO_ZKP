@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma experimental ABIEncoderV2;
+
 pragma solidity >=0.4.22 <0.9.0;
+
 import "./GardenManager.sol";
 import "./Verifier.sol";
 
@@ -11,7 +13,7 @@ contract AdminManager{
     event newDispute( uint _disputeIndex);
 
     //admin area
-    mapping (address=>bool) ContractAdmins; 
+    mapping (address=>bool) ContractAdmins;
     address private deployer;
     string public ContactP2P;
     uint public MinApprovals;
@@ -26,7 +28,7 @@ contract AdminManager{
         bool isOpen;
     }
     mapping (uint=>GardenProposal) public GardenProposals;
-    
+
     //dispute proposal area
     struct DisputeProposal{
         uint gardenIndex;
@@ -38,7 +40,7 @@ contract AdminManager{
         bool isReady;
     }
     mapping(uint=>DisputeProposal) public DisputeProposals;
-   
+
     constructor (address[] memory _contractAdmins,uint _minApprovals, address _verifierContract, string memory _contactP2P) public {
         for (uint i = 0; i < _contractAdmins.length; i++) {
             ContractAdmins[_contractAdmins[i]]=true;
@@ -54,12 +56,12 @@ contract AdminManager{
         _;
     }
     modifier OnlyValidGardenProposal(uint _gardenIndex){
-        require(GardenProposals[_gardenIndex].isOpen, "GardenProposal should be open.");   
-        _;   
+        require(GardenProposals[_gardenIndex].isOpen, "GardenProposal should be open.");
+        _;
     }
     modifier OnlyOpenDisputeProposal(uint _disputeIndex){
-        require(DisputeProposals[_disputeIndex].isOpen, "DisputeProposal should be open."); 
-        _;   
+        require(DisputeProposals[_disputeIndex].isOpen, "DisputeProposal should be open.");
+        _;
     }
     modifier OnlyDeployer(){
         require(msg.sender==deployer);
@@ -142,16 +144,16 @@ contract AdminManager{
     }
 
     function AcceptDispute(uint _disputeIndex) external OnlyAdmin() OnlyOpenDisputeProposal(_disputeIndex){
-        DisputeProposal storage proposal = DisputeProposals[_disputeIndex]; 
-        require(proposal.isReady,"Amounts not set"); 
-        bool alreadyVoted =false; 
+        DisputeProposal storage proposal = DisputeProposals[_disputeIndex];
+        require(proposal.isReady,"Amounts not set");
+        bool alreadyVoted =false;
         for (uint i = 0; i < proposal.acceptProposal.length; i++) {
             if(proposal.acceptProposal[i]==msg.sender){
                 alreadyVoted=true;
                 break;
             }
         }
-        require(!alreadyVoted, "You should only vote once");        
+        require(!alreadyVoted, "You should only vote once");
         proposal.acceptProposal.push(msg.sender);
         if(proposal.acceptProposal.length==MinApprovals){
             GManager.CloseDispute(proposal.gardenIndex, proposal.ownerAmount,proposal.tenantAmount);
