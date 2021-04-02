@@ -7,6 +7,7 @@ let tryCatch = require("./exceptions.js").tryCatch;
 let errTypes = require("./exceptions.js").errTypes;
 let gardenType = require("./Utils.js").GardenType;
 let gardenStatus = require("./Utils.js").GardenStatus;
+//hash of 256 bits separated in two hex then converted to number (required in input of zokrates proof) :
 const secretHash=["263561599766550617289250058199814760685", "65303172752238645975888084098459749904"];
 
 contract('Testing Garden Manager contract', function (accounts) {
@@ -24,29 +25,29 @@ contract('Testing Garden Manager contract', function (accounts) {
         AdminContract = await adminManager.new([firstSigner, secondSigner, thirdSigner], minApprovals,Verifier.address,P2PContact, { from: deployer});   
         GardenManager = await gardenManager.new(AdminContract.address, Verifier.address);
         GardenManagerAddress= GardenManager.address;
-        await AdminContract.AddGardenManagerAddress(GardenManagerAddress, {from:deployer});
+        await AdminContract.addGardenManagerAddress(GardenManagerAddress, {from:deployer});
     })
     it('Verifier contract address should be correct', async function () {
-        let retrievedAddress = await GardenManager.GetVerifierContractAddress();
+        let retrievedAddress = await GardenManager.VerifierContract();
         assert.equal(retrievedAddress, Verifier.address);
     })
     it('Only AdminManager contract should modify verifier contract address',async function(){
-        await AdminContract.ModifyVerifierContractAddress(accounts[7], {from:deployer});
-        let retrievedAddress = await GardenManager.GetVerifierContractAddress();
+        await AdminContract.modifyVerifierContractAddress(accounts[7], {from:deployer});
+        let retrievedAddress = await GardenManager.VerifierContract();
         assert.equal(retrievedAddress,accounts[7]);
 
-        await tryCatch(GardenManager.ModifyVerifierContract(accounts[2]), errTypes.revert);
+        await tryCatch(GardenManager.modifyVerifierContract(accounts[2]), errTypes.revert);
     })
     it('Users could create gardens', async function () {        
         let city="Brest";
         let area=300;
 
-        // function CreateGarden(uint[2] calldata _secretHash, string calldata _district,uint32 _area, string calldata _contact, GLibrary.GardenType _gardenType, bool _multipleOwners, address payable[] calldata _coOwners)
-        await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
-        await GardenManager.CreateGarden(secretHash,"toulouse",567,"mail@contact.io",gardenType.Hobby,false,[]);
-        let result = await GardenManager.CreateGarden(secretHash,city,area,"mail@contact.io",gardenType.Vegetable,true,[secondSigner,thirdSigner],{from:accounts[2]});
+        // function createGarden(uint[2] calldata _secretHash, string calldata _district,uint32 _area, string calldata _contact, GLibrary.GardenType _gardenType, bool _multipleOwners, address payable[] calldata _coOwners)
+        await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        await GardenManager.createGarden(secretHash,"toulouse",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,city,area,"mail@contact.io",gardenType.Vegetable,true,[secondSigner,thirdSigner],{from:accounts[2]});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         
         assert.equal(gardenIndex,2);
         assert.equal(retrievedGarden.owner,gardenOwner);
@@ -62,232 +63,245 @@ contract('Testing Garden Manager contract', function (accounts) {
     })
     it('Only garden owner should modify gardenContact',async function(){
         let owner = accounts[5];
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:owner});
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:owner});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
         assert.equal(gardenOwner,owner);
-        await GardenManager.UpdateGardenContact(gardenIndex,"modifiedContact@test.com",{from:gardenOwner});
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.updateGardenContact(gardenIndex,"modifiedContact@test.com",{from:gardenOwner});
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.contact,"modifiedContact@test.com");  
 
         let fakeOwner = accounts[2];
-        await tryCatch(GardenManager.UpdateGardenContact(gardenIndex,"mail@contact.io",{from:fakeOwner}), errTypes.revert);
+        await tryCatch(GardenManager.updateGardenContact(gardenIndex,"mail@contact.io",{from:fakeOwner}), errTypes.revert);
     })
     it('Only garden owner with valid proof should modify gardenSecretHash',async function(){
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
 
         let newSecretHash = [2345678908,5535434546546];
         
         let fakeOwner = accounts[1];
-        await tryCatch(GardenManager.UpdateGardenSecretHash(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,newSecretHash,{from:fakeOwner}), errTypes.revert);
+        await tryCatch(GardenManager.updateGardenSecretHash(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,newSecretHash,{from:fakeOwner}), errTypes.revert);
         
         let fakeProof=["0xf","0xf"];
-        await tryCatch(GardenManager.UpdateGardenSecretHash(gardenIndex,fakeProof,validProof.proof.b,validProof.proof.c,newSecretHash,{from:gardenOwner}), errTypes.revert);
+        await tryCatch(GardenManager.updateGardenSecretHash(gardenIndex,fakeProof,validProof.proof.b,validProof.proof.c,newSecretHash,{from:gardenOwner}), errTypes.revert);
         
-        await GardenManager.UpdateGardenSecretHash(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,newSecretHash,{from:gardenOwner});
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.updateGardenSecretHash(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,newSecretHash,{from:gardenOwner});
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.secretHash[0],newSecretHash[0]);  
     })
     it('Only adminContract should accept gardens',async function(){
-        let result =await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
+        let result =await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
 
-        await tryCatch(GardenManager.AcceptGarden(gardenIndex,{from:gardenOwner}), errTypes.revert);
+        await tryCatch(GardenManager.acceptGarden(gardenIndex,{from:gardenOwner}), errTypes.revert);
 
         await ValidateGardenByAdminContract(gardenIndex);
 
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
     })
     it('Only adminContract should reject gardens',async function(){
-        let result =await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
+        let result =await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
 
-        await tryCatch(GardenManager.RejectGarden(gardenIndex,{from:gardenOwner}), errTypes.revert);
+        await tryCatch(GardenManager.rejectGarden(gardenIndex,{from:gardenOwner}), errTypes.revert);
 
         await RejectGardenByAdminContract(gardenIndex);
 
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Blacklist);
     })
     it('Validated garden owner with valid proofs could propose offer',async function(){
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[],{from:accounts[5]});
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
 
         let tenant = accounts[2];
         let duration = 4 ; //value in days
 
         //wrong status :
-        await tryCatch(GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: gardenOwner}),errTypes.revert);
+        await tryCatch(GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: gardenOwner}),errTypes.revert);
         
         await ValidateGardenByAdminContract(gardenIndex);
 
         //not the owner :
-        await tryCatch(GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[2]}),errTypes.revert);
+        await tryCatch(GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[2]}),errTypes.revert);
         
         //incorrect proof :
-        await tryCatch(GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),["0xf","0xf"],validProof.proof.b,validProof.proof.c,{from: gardenOwner}),errTypes.revert);
+        await tryCatch(GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),["0xf","0xf"],validProof.proof.b,validProof.proof.c,{from: gardenOwner}),errTypes.revert);
         
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: gardenOwner});
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(duration),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: gardenOwner});
+        let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Blocked);
-        assert.equal(web3.utils.fromWei(retrievedGarden.rents[0].price),1);
-        assert.equal(retrievedGarden.rents[0].rate,-1);
-        assert.equal(retrievedGarden.rents[0].tenant,tenant);
+        assert.equal(web3.utils.fromWei(retrievedRent.price),1);
+        assert.equal(retrievedRent.rate,-1);
+        assert.equal(retrievedRent.tenant,tenant);
     })
     it('Garden owner with valid proof could delete garden offer if tenant not responding and status "blocked"',async function () {
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Waiting);
         
         //wrong status :
-        await tryCatch(GardenManager.DeleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c),errTypes.revert);
+        await tryCatch(GardenManager.deleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c),errTypes.revert);
 
         await ValidateGardenByAdminContract(gardenIndex);
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
 
         //wrong status :
-        await tryCatch(GardenManager.DeleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c),errTypes.revert);
+        await tryCatch(GardenManager.deleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c),errTypes.revert);
 
 
-        await GardenManager.ProposeGardenOffer(gardenIndex,accounts[7],GetSecondsFromDays(3),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.proposeGardenOffer(gardenIndex,accounts[7],GetSecondsFromDays(3),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Blocked);
-        await GardenManager.DeleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        await GardenManager.deleteGardenOffer(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c);
 
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
-        assert.isEmpty(retrievedGarden.rents);
+        assert.equal(retrievedGarden.rentLength,0);
     })
     it('Only correct tenant could accept garden offer',async function () {
         let tenant = accounts[3];
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
         await ValidateGardenByAdminContract(gardenIndex);
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(3),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(3),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
         
         //not the tenant :
-        await tryCatch(GardenManager.AcceptGardenOffer(gardenIndex,{from: accounts[2],value:web3.utils.toWei('1', 'ether')}),errTypes.revert);
+        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,{from: accounts[2],value:web3.utils.toWei('1', 'ether')}),errTypes.revert);
         //ether amount insufficient :
-        await tryCatch(GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('0.5', 'ether')}),errTypes.revert);
+        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('0.5', 'ether')}),errTypes.revert);
         
-        await GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1', 'ether')});
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1', 'ether')});
+        let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.CodeWaiting);
-        assert.equal(web3.utils.fromWei(retrievedGarden.rents[0].balance),1);
-        assert.equal(retrievedGarden.rents[0].beginning,0);
+        assert.equal(web3.utils.fromWei(retrievedRent.balance),1);
+        assert.equal(retrievedRent.beginning,0);
     })
     it('Owner can add access code to garden only if status is "code waiting"',async function () {
         let tenant = accounts[3];
         let locationDuration = 3; //value in days
+        let hashedCode = "0x4092503716f23af46b012c27a434e2e0416087dc42d853f57864fa289b6a9102";
 
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
 
         await ValidateGardenByAdminContract(gardenIndex);
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(locationDuration) ,web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(locationDuration) ,web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         //wrong status :
         assert.equal(retrievedGarden.status,gardenStatus.Blocked);
-        await tryCatch(GardenManager.AddAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,"hashedAccessCode","EncryptedAccessCode",{from: gardenOwner}),errTypes.revert);
+        await tryCatch(GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode",{from: gardenOwner}),errTypes.revert);
 
-        await GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1.5', 'ether')});
-        await GardenManager.AddAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,"hashedAccessCode","EncryptedAccessCode",{from: gardenOwner});
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1.5', 'ether')});
+        await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode",{from: gardenOwner});
+        [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Location);
-        assert.isAtLeast(parseInt(retrievedGarden.rents[0].beginning), GetCurrentDateInSeconds()-5);
-        assert.equal(retrievedGarden.rents[0].accessCode.hashCode,"hashedAccessCode");
-        assert.equal(retrievedGarden.rents[0].accessCode.encryptedCode,"EncryptedAccessCode");
+        assert.isAtLeast(parseInt(retrievedRent.beginning), GetCurrentDateInSeconds()-5);
+        assert.equal(retrievedRent.gardenHashCode,hashedCode);
+
+        //not the owner nor the tenant :
+        await tryCatch(GardenManager.getAccessCodeByGardenId(gardenIndex,{from: accounts[7]}),errTypes.revert);
+
+        let retrievedEncryptedCode = await GardenManager.getAccessCodeByGardenId(gardenIndex,{from: tenant});
+        assert.equal(retrievedEncryptedCode,"EncryptedAccessCode");
+        retrievedEncryptedCode = await GardenManager.getAccessCodeByGardenId(gardenIndex,{from: gardenOwner});
+        assert.equal(retrievedEncryptedCode,"EncryptedAccessCode");
     })
 
     it('Tenant could get refund only if accessCode is missing',async function () {
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
         let tenant = accounts[2];
         let locationPrice ="8";
 
         await ValidateGardenByAdminContract(gardenIndex);
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(2) ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(2) ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
 
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.CodeWaiting);
-        assert.equal(web3.utils.fromWei(retrievedGarden.rents[0].balance),locationPrice);
+        assert.equal(web3.utils.fromWei(retrievedRent.balance),locationPrice);
         let tenantBalanceBeforeRefund = await GetBalance(tenant);
 
         //not the tenant :
-        await tryCatch(GardenManager.GetRefundBeforeLocation(gardenIndex,{from:accounts[0]}),errTypes.revert);
+        await tryCatch(GardenManager.getRefundBeforeLocation(gardenIndex,{from:accounts[0]}),errTypes.revert);
         
-        await GardenManager.GetRefundBeforeLocation(gardenIndex,{from:tenant});
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
+        await GardenManager.getRefundBeforeLocation(gardenIndex,{from:tenant});
+        [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
-        assert.equal(retrievedGarden.rents[0].balance,0);
+        assert.equal(retrievedRent.balance,0);
         
         let tenantBalanceAfterRefund = await GetBalance(tenant);
         assert.isAbove(tenantBalanceAfterRefund, tenantBalanceBeforeRefund);
     })
     it('Tenant can add location grade to rent only if location is over and if there is no grade yet',async function () {
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
         let tenant = accounts[2];
         let locationPrice ="2";
         let locationDurationInSeconds = 3;
         let grade =4;
+        let hashedCode = "0x4092503716f23af46b012c27a434e2e0416087dc42d853f57864fa289b6a9102";
 
         await ValidateGardenByAdminContract(gardenIndex);
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,locationDurationInSeconds ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
-        await GardenManager.AddAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,"hashedAccessCode","EncryptedAccessCode");
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,locationDurationInSeconds ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode");
         
         //location not over :
-        await GardenManager.AddGradeToGarden(gardenIndex,grade,{from:tenant});
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
-        assert.equal(retrievedGarden.rents[0].rate,-1);
+        await GardenManager.addGradeToGarden(gardenIndex,grade,{from:tenant});
+        let [,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
+        assert.equal(retrievedRent.rate,-1);
 
         sleep(3000);
 
         //not the tenant :
-        await GardenManager.AddGradeToGarden(gardenIndex,grade,{from:accounts[0]});
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
-        assert.equal(retrievedGarden.rents[0].rate,-1);
+        await GardenManager.addGradeToGarden(gardenIndex,grade,{from:accounts[0]});
+        [,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
+        assert.equal(retrievedRent.rate,-1);
 
         //incorrect grade :
-        await tryCatch(GardenManager.AddGradeToGarden(gardenIndex,8,{from:tenant}),errTypes.revert);
+        await tryCatch(GardenManager.addGradeToGarden(gardenIndex,8,{from:tenant}),errTypes.revert);
 
-        await GardenManager.AddGradeToGarden(gardenIndex,grade,{from:tenant});
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
-        assert.equal(retrievedGarden.rents[0].rate,grade);
+        await GardenManager.addGradeToGarden(gardenIndex,grade,{from:tenant});
+        [,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
+        assert.equal(retrievedRent.rate,grade);
 
         //already graded : 
-        await GardenManager.AddGradeToGarden(gardenIndex,grade,{from:tenant});
+        await GardenManager.addGradeToGarden(gardenIndex,grade,{from:tenant});
     })
 
     it('AdminManager contract should close dispute and pay the correct people',async function () {
         let multipleOwners=[accounts[0],accounts[2]];
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,true,multipleOwners);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,true,multipleOwners);
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
         let tenant = accounts[3];
         let locationPrice ="3";
+        let hashedCode = "0x4092503716f23af46b012c27a434e2e0416087dc42d853f57864fa289b6a9102";
+
         await ValidateGardenByAdminContract(gardenIndex);
-        await GardenManager.ProposeGardenOffer(gardenIndex,tenant,3 ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.AcceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
-        await GardenManager.AddAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,"hashedAccessCode","EncryptedAccessCode");
+        await GardenManager.proposeGardenOffer(gardenIndex,tenant,3 ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
+        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode");
         
         let tenantBalanceBeforeRefund= await GetBalance(tenant);
         let firstOwnerBalanceBeforeRefund= await GetBalance(multipleOwners[0]);
         let secondOwnerBalanceBeforeRefund= await GetBalance(multipleOwners[1]);
-        await GardenManager.AddDispute(gardenIndex);
-        let retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
-        assert.equal(web3.utils.fromWei(retrievedGarden.rents[0].balance),3);
-        await tryCatch(GardenManager.CloseDispute(gardenIndex,'2','1'),errTypes.revert);
+        await GardenManager.addDispute(gardenIndex);
+        let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
+        assert.equal(web3.utils.fromWei(retrievedRent.balance),3);
+
+        //only admin contract should close dispute :
+        await tryCatch(GardenManager.closeDispute(gardenIndex,'2','1'),errTypes.revert);
         await CloseDisputeByAdminContract(0,'2','1');
 
-        retrievedGarden = await GardenManager.GetGardenById(gardenIndex);
-        assert.isEmpty(retrievedGarden.rents[0].accessCode.hashCode);
-        assert.equal(retrievedGarden.rents[0].balance,0);
+        [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
+        assert.equal(retrievedRent.balance,0);        
+        assert.equal(retrievedRent.gardenHashCode,"0x0000000000000000000000000000000000000000000000000000000000000000");
 
         let tenantBalanceAfterRefund= await GetBalance(tenant);
         let firstOwnerBalanceAfterRefund= await GetBalance(multipleOwners[0]);
@@ -300,22 +314,28 @@ contract('Testing Garden Manager contract', function (accounts) {
 
     async function ValidateGardenByAdminContract(gardenId) {
         for (let i = 0; i < minApprovals; i++) {
-            await AdminContract.AcceptGarden(gardenId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[i]});            
+            await AdminContract.acceptGarden(gardenId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[i]});            
         }
     }
     async function RejectGardenByAdminContract(gardenId) {
         for (let i = 0; i < minApprovals; i++) {
-            await AdminContract.RejectGarden(gardenId,{from: accounts[i]});            
+            await AdminContract.rejectGarden(gardenId,{from: accounts[i]});            
         }
     }
     async function CloseDisputeByAdminContract(disputeIndex,ownerAmount,tenantAmount) {
-        await AdminContract.SetAmountForDispute(disputeIndex,web3.utils.toWei(ownerAmount),web3.utils.toWei(tenantAmount),{from:accounts[0]});
+        await AdminContract.setAmountForDispute(disputeIndex,web3.utils.toWei(ownerAmount),web3.utils.toWei(tenantAmount),{from:accounts[0]});
         for (let i = 1; i < minApprovals; i++) {
-            await AdminContract.AcceptDispute(disputeIndex,{from:accounts[i]});            
+            await AdminContract.acceptDispute(disputeIndex,{from:accounts[i]});            
         }
     }
     async function GetBalance(address) {
         return parseInt(web3.utils.fromWei(await web3.eth.getBalance(address)));
+    }
+    async function GetGardenAndRentsById(gardenIndex, rentId=null) {
+        let garden = await GardenManager.getGardenById(gardenIndex);
+        let lastRent = garden.rentLength-1;
+        let rent = await GardenManager.getRentByGardenAndRentId(gardenIndex,rentId==null?lastRent:rentId);
+        return [garden,rent];
     }
     function GetSecondsFromDays(days) {
         return days*24*60*60;

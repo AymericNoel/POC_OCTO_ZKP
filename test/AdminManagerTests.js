@@ -24,7 +24,7 @@ contract('Testing Admin Manager contract', function (accounts) {
         AdminContract = await adminManager.new([firstSigner, secondSigner, thirdSigner], minApprovals,Verifier.address,P2PContact, { from: deployer });   
         GardenManager = await gardenManager.new(AdminContract.address, Verifier.address);
         GardenManagerAddress= GardenManager.address;
-        await AdminContract.AddGardenManagerAddress(GardenManagerAddress, {from:deployer});
+        await AdminContract.addGardenManagerAddress(GardenManagerAddress, {from:deployer});
     })
     it('GardenManager contract address should be correct', async function () {
         let retrievedAddress = await AdminContract.GManager()
@@ -35,86 +35,86 @@ contract('Testing Admin Manager contract', function (accounts) {
         assert.equal(retrievedAddress,Verifier.address);
 
         let newVerifierContractAddress = accounts[7];
-        await AdminContract.ModifyVerifierContractAddress(newVerifierContractAddress, {from:deployer});
+        await AdminContract.modifyVerifierContractAddress(newVerifierContractAddress, {from:deployer});
         retrievedAddress = await AdminContract.VerifierContract();
         assert.equal(retrievedAddress,newVerifierContractAddress);
     })
     it('Non deployer can t modify VerifierContract address', async function(){
-        await tryCatch(AdminContract.ModifyVerifierContractAddress(accounts[7], {from: nonAdmin}), errTypes.revert);
+        await tryCatch(AdminContract.modifyVerifierContractAddress(accounts[7], {from: nonAdmin}), errTypes.revert);
     })
     it('Only GardenManager contract should add gardenProposal',async function () {
         await AddGardenProposal(secretHash);
         let retrievedId=await AddGardenProposal(secretHash);    
-        let retrievedGardenProposal = await AdminContract.GetGardenProposalById(retrievedId);
+        let retrievedGardenProposal = await AdminContract.getGardenProposalById(retrievedId);
         assert.equal(retrievedGardenProposal.gardenIndex,retrievedId);
         assert.equal(retrievedGardenProposal.gardenIndex,1);
         assert.equal(retrievedGardenProposal.isOpen,true);
         
         //call not from gardenManager contract :
-        await tryCatch(AdminContract.AddGarden(5,["0xc6481e22c5ff4163af680b8cfaa5e8ed", "0x3120eeff89c4f307c4a6faaae059ce10"]),errTypes.revert);
+        await tryCatch(AdminContract.addGarden(5,["0xc6481e22c5ff4163af680b8cfaa5e8ed", "0x3120eeff89c4f307c4a6faaae059ce10"]),errTypes.revert);
     })
     it('Admins with valid proofs can accept gardenProposal',async function(){
         let retrievedId= await AddGardenProposal(secretHash);
-        await AdminContract.AcceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner});
-        let retrievedGardenProposal = await AdminContract.GetGardenProposalById(retrievedId);        
+        await AdminContract.acceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner});
+        let retrievedGardenProposal = await AdminContract.getGardenProposalById(retrievedId);        
         assert.equal(retrievedGardenProposal.acceptProposal[0],firstSigner);
     })
     it('Non admins could not accept gardenProposal',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        await tryCatch(AdminContract.AcceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: nonAdmin}),errTypes.revert)
+        await tryCatch(AdminContract.acceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: nonAdmin}),errTypes.revert)
     })
     it('Admins with invalid proofs could not accept gardenProposal',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        await tryCatch(AdminContract.AcceptGarden(retrievedId,["0x2961","0x2961"],validProof.proof.b,validProof.proof.c,{from: secondSigner}),errTypes.revert )
+        await tryCatch(AdminContract.acceptGarden(retrievedId,["0x2961","0x2961"],validProof.proof.b,validProof.proof.c,{from: secondSigner}),errTypes.revert )
     })
     it('Admins could not accept proposal with fake id',async function () {
         let fakeId=89;
         await AddGardenProposal(secretHash);
-        await tryCatch(AdminContract.AcceptGarden(fakeId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: secondSigner}),errTypes.revert )
+        await tryCatch(AdminContract.acceptGarden(fakeId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: secondSigner}),errTypes.revert )
     })
     it('Admins couldn t accept gardenProposal twice',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        await AdminContract.AcceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner});
-        await tryCatch(AdminContract.AcceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner}),errTypes.revert)
+        await AdminContract.acceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner});
+        await tryCatch(AdminContract.acceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: firstSigner}),errTypes.revert)
     })
     it('Proposal validated by all admins should be closed',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        let retrievedGardenProposals = await AdminContract.GetGardenProposalById.call(retrievedId);
+        let retrievedGardenProposals = await AdminContract.getGardenProposalById(retrievedId);
         assert.equal(retrievedGardenProposals.isOpen,true);
         for (let i = 0; i < minApprovals; i++) {
-            await AdminContract.AcceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[i]});            
+            await AdminContract.acceptGarden(retrievedId,validProof.proof.a,validProof.proof.b,validProof.proof.c,{from: accounts[i]});            
         }
-        retrievedGardenProposals = await AdminContract.GetGardenProposalById.call(retrievedId);
+        retrievedGardenProposals = await AdminContract.getGardenProposalById(retrievedId);
         assert.isFalse(retrievedGardenProposals.isOpen);
     })
     it('Non admins could not reject gardenProposal',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        await tryCatch(AdminContract.RejectGarden(retrievedId,{from: nonAdmin}),errTypes.revert)
+        await tryCatch(AdminContract.rejectGarden(retrievedId,{from: nonAdmin}),errTypes.revert)
     })
     it('Admins could not reject proposal with fake id',async function () {
         let fakeId = 98;
         await AddGardenProposal(secretHash);
-        await tryCatch(AdminContract.RejectGarden(fakeId,{from: secondSigner}),errTypes.revert )
+        await tryCatch(AdminContract.rejectGarden(fakeId,{from: secondSigner}),errTypes.revert )
     })
     it('Proposal rejected by all admins should be closed',async function () {
         let retrievedId= await AddGardenProposal(secretHash);
-        let retrievedGardenProposal = await AdminContract.GetGardenProposalById(retrievedId);
+        let retrievedGardenProposal = await AdminContract.getGardenProposalById(retrievedId);
         assert.isTrue(retrievedGardenProposal.isOpen);
         for (let i = 0; i < minApprovals; i++) {
-            await AdminContract.RejectGarden(retrievedId,{from: accounts[i]});            
+            await AdminContract.rejectGarden(retrievedId,{from: accounts[i]});            
         }
-        retrievedGardenProposal = await AdminContract.GetGardenProposalById(retrievedId);
+        retrievedGardenProposal = await AdminContract.getGardenProposalById(retrievedId);
         assert.isFalse(retrievedGardenProposal.isOpen);
     })
     it('Only GardenManager contract should add disputeProposal',async function () {
         let gardenIndex = 5;
         let gardenManagerAddress= accounts[8];
-        await AdminContract.AddGardenManagerAddress(gardenManagerAddress, {from:accounts[0]});
+        await AdminContract.addGardenManagerAddress(gardenManagerAddress, {from:accounts[0]});
 
-        await tryCatch(AdminContract.AddDispute(gardenIndex,2,{from:accounts[2]}),errTypes.revert);
+        await tryCatch(AdminContract.addDispute(gardenIndex,2,{from:accounts[2]}),errTypes.revert);
 
-        await AdminContract.AddDispute(gardenIndex,2,{from:gardenManagerAddress});
-        let retrievedDisputeProposal=await AdminContract.GetDisputeProposalById(0);
+        await AdminContract.addDispute(gardenIndex,2,{from:gardenManagerAddress});
+        let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(0);
         assert.equal(retrievedDisputeProposal.gardenIndex,gardenIndex);
         assert.isTrue(retrievedDisputeProposal.isOpen);
         assert.isFalse(retrievedDisputeProposal.isReady);
@@ -124,41 +124,41 @@ contract('Testing Admin Manager contract', function (accounts) {
         let disputeId = await AddDisputeProposal(gardenBalance);
 
         //non deployer : 
-        await tryCatch(AdminContract.SetAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: nonAdmin}),errTypes.revert);
+        await tryCatch(AdminContract.setAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: nonAdmin}),errTypes.revert);
 
         //invalid amount : 
-        await tryCatch(AdminContract.SetAmountForDispute(disputeId,2,1,{from: deployer}),errTypes.revert);
+        await tryCatch(AdminContract.setAmountForDispute(disputeId,2,1,{from: deployer}),errTypes.revert);
         
-        await AdminContract.SetAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: deployer});
+        await AdminContract.setAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: deployer});
 
-        let retrievedDisputeProposal=await AdminContract.GetDisputeProposalById(disputeId);
+        let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(disputeId);
         assert.equal(retrievedDisputeProposal.ownerAmount,2);
     })
     it('Only deployer should modify amount for dispute and reset validations',async function () {
         let gardenBalance = 4;
         let disputeId = await AddDisputeProposal(gardenBalance);
-        await AdminContract.SetAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: deployer});
-        await AdminContract.AcceptDispute(disputeId,{from:secondSigner});
+        await AdminContract.setAmountForDispute(disputeId,gardenBalance/2,gardenBalance/2,{from: deployer});
+        await AdminContract.acceptDispute(disputeId,{from:secondSigner});
         
-        let retrievedDisputeProposal=await AdminContract.GetDisputeProposalById(disputeId);
+        let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(disputeId);
         assert.lengthOf(retrievedDisputeProposal.acceptProposal,2);
 
-        await AdminContract.SetAmountForDispute(0,gardenBalance,0,{from: deployer});
-        retrievedDisputeProposal=await AdminContract.GetDisputeProposalById(disputeId);
+        await AdminContract.setAmountForDispute(0,gardenBalance,0,{from: deployer});
+        retrievedDisputeProposal=await AdminContract.getDisputeProposalById(disputeId);
         assert.lengthOf(retrievedDisputeProposal.acceptProposal,1);
         assert.equal(retrievedDisputeProposal.ownerAmount,gardenBalance);
     })
 
     async function AddGardenProposal(secretHash){
         // function CreateGarden(uint[2] calldata _secretHash, string calldata _district,uint32 _area, string calldata _contact, GLibrary.GardenType _gardenType, bool _multipleOwners, address payable[] calldata _coOwners)
-        let result = await GardenManager.CreateGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
+        let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
         return result.logs[0].args._gardenIndex.toNumber();
     }
     async function AddDisputeProposal(gardenBalance) {
         let gardenIndex = 2;
         let gardenManagerAddress= accounts[8];
-        await AdminContract.AddGardenManagerAddress(gardenManagerAddress, {from:deployer});
-        await AdminContract.AddDispute(gardenIndex,gardenBalance,{from:gardenManagerAddress});
+        await AdminContract.addGardenManagerAddress(gardenManagerAddress, {from:deployer});
+        await AdminContract.addDispute(gardenIndex,gardenBalance,{from:gardenManagerAddress});
         return 0;
     }
 })

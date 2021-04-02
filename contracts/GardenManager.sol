@@ -241,14 +241,14 @@ contract GardenManager {
         require(isRentOver(lastRent.beginning,lastRent.duration),"Location not over");
         uint balance = lastRent.balance;
         lastRent.balance=0;
-        lastRent.accessCode.hashCode="";
+        lastRent.accessCode.hashCode= 0;
         AllGarden[_gardenIndex].status=GLibrary.Status.Free;
         if(garden.multipleOwners){
             uint payroll = balance/garden.coOwners.length;
-            transferPaymentToMultipleOwners(payroll,garden);    
+            transferPaymentToMultipleOwners(payroll,garden);
         }else{
             garden.owner.transfer(balance);
-        }        
+        }
     }
 
     /// @dev Tenant should use this function to add a grade to his locations between 1 and 5.
@@ -299,7 +299,7 @@ contract GardenManager {
             }
         }
         lastRent.balance=0;
-        lastRent.accessCode.hashCode="";
+        lastRent.accessCode.hashCode=0;
         garden.status=GLibrary.Status.Free;
     }
 
