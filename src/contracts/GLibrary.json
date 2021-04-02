@@ -23,18 +23,19 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.1+commit.e6f7d5a4\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_beginning\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_duration\",\"type\":\"uint256\"}],\"name\":\"IsRentOver\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/GLibrary.sol\":\"GLibrary\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/GLibrary.sol\":{\"keccak256\":\"0x36b47e4c2690e5b83a1c5d43d2bdbf19d4bb79a168e99230004e4da04ea54b12\",\"urls\":[\"bzz-raw://b11b8f330296f7d469b6906952ea8b17a13afd0fdcbc7082317d3849586c003a\",\"dweb:/ipfs/QmQJFjK5eHDLW1or2WmayLQhJ3LhU67mBTG8poJZuHtHzU\"]}},\"version\":1}",
-  "bytecode": "0x60d8610025600b82828239805160001a60731461001857fe5b30600052607381538281f3fe730000000000000000000000000000000000000000301460806040526004361060335760003560e01c8063b5a16593146038575b600080fd5b606b60048036036040811015604c57600080fd5b8101908080359060200190929190803590602001909291905050506085565b604051808215151515815260200191505060405180910390f35b6000428284011160975760019050609c565b600090505b9291505056fea2646970667358221220d520eab9aec28fb3e511597c6d60652e615a21ff1010742b36a983265ad5cffd64736f6c63430006010033",
-  "deployedBytecode": "0x730000000000000000000000000000000000000000301460806040526004361060335760003560e01c8063b5a16593146038575b600080fd5b606b60048036036040811015604c57600080fd5b8101908080359060200190929190803590602001909291905050506085565b604051808215151515815260200191505060405180910390f35b6000428284011160975760019050609c565b600090505b9291505056fea2646970667358221220d520eab9aec28fb3e511597c6d60652e615a21ff1010742b36a983265ad5cffd64736f6c63430006010033",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.1+commit.e6f7d5a4\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_beginning\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_duration\",\"type\":\"uint256\"}],\"name\":\"IsRentOver\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/contracts/GLibrary.sol\":\"GLibrary\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/contracts/GLibrary.sol\":{\"keccak256\":\"0x36b47e4c2690e5b83a1c5d43d2bdbf19d4bb79a168e99230004e4da04ea54b12\",\"urls\":[\"bzz-raw://b11b8f330296f7d469b6906952ea8b17a13afd0fdcbc7082317d3849586c003a\",\"dweb:/ipfs/QmQJFjK5eHDLW1or2WmayLQhJ3LhU67mBTG8poJZuHtHzU\"]}},\"version\":1}",
+  "bytecode": "0x60d8610025600b82828239805160001a60731461001857fe5b30600052607381538281f3fe730000000000000000000000000000000000000000301460806040526004361060335760003560e01c8063b5a16593146038575b600080fd5b606b60048036036040811015604c57600080fd5b8101908080359060200190929190803590602001909291905050506085565b604051808215151515815260200191505060405180910390f35b6000428284011160975760019050609c565b600090505b9291505056fea26469706673582212205320e395ad3e58f00fa63f04213aded71177ef13eaffdaa7da55db59bffcf90664736f6c63430006010033",
+  "deployedBytecode": "0x730000000000000000000000000000000000000000301460806040526004361060335760003560e01c8063b5a16593146038575b600080fd5b606b60048036036040811015604c57600080fd5b8101908080359060200190929190803590602001909291905050506085565b604051808215151515815260200191505060405180910390f35b6000428284011160975760019050609c565b600090505b9291505056fea26469706673582212205320e395ad3e58f00fa63f04213aded71177ef13eaffdaa7da55db59bffcf90664736f6c63430006010033",
   "sourceMap": "58:946:1:-:0;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24",
   "deployedSourceMap": "58:946:1:-:0;;;;;;;;;;;;;;;;;;;;;;;;799:202;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;799:202:1;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;873:4;917:15;905:9;892:10;:22;:40;889:82;;955:4;948:11;;;;889:82;988:5;981:12;;799:202;;;;;:::o",
   "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.6.1;\r\nlibrary GLibrary{\r\n    enum GardenType{Vegetable, Hobby}\r\n    enum Status{Waiting,Free,Blocked,CodeWaiting,Location,Blacklist,Dispute}\r\n    struct Garden{\r\n        address payable owner;\r\n        bool multipleOwners;\r\n        address payable[] coOwners;\r\n        GardenType gardenType;\r\n        string district;\r\n        uint32 area;\r\n        uint[2] secretHash;\r\n        string contact;\r\n        Status status; \r\n        Rent[] rents;\r\n    }\r\n    struct Rent{\r\n        int rate;\r\n        uint duration; \r\n        uint price;\r\n        uint beginning;\r\n        uint balance;\r\n        address payable tenant;\r\n        AccessCode accessCode;\r\n    }\r\n    struct AccessCode{\r\n        string hashCode;\r\n        string encryptedCode;\r\n    }\r\n\r\n    function IsRentOver(uint _beginning, uint _duration) public view returns (bool){\r\n        if(_beginning + _duration<= block.timestamp){\r\n            return true;\r\n        }\r\n        return false;\r\n    }\r\n}",
-  "sourcePath": "C:\\Users\\aymeric.noel\\Desktop\\ZKP\\POC_ZKP\\smart_contracts\\contracts\\GLibrary.sol",
+  "sourcePath": "C:\\Users\\aymeric.noel\\Desktop\\ZKP\\POC_ZKP\\contracts\\GLibrary.sol",
   "ast": {
-    "absolutePath": "/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/GLibrary.sol",
+    "absolutePath": "/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/contracts/GLibrary.sol",
     "exportedSymbols": {
       "GLibrary": [
         749
@@ -817,7 +818,7 @@
                         "name": "block",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4481,
+                        "referencedDeclaration": 4514,
                         "src": "917:5:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_block",
@@ -1025,7 +1026,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/smart_contracts/contracts/GLibrary.sol",
+      "absolutePath": "/C/Users/aymeric.noel/Desktop/ZKP/POC_ZKP/contracts/GLibrary.sol",
       "exportedSymbols": {
         "GLibrary": [
           749
@@ -1972,7 +1973,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4481,
+                                  "referencedDeclaration": 4514,
                                   "type": "block",
                                   "value": "block"
                                 },
@@ -2081,15 +2082,16 @@
     "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
   },
   "networks": {
-    "5777": {
+    "1617356701125": {
       "events": {},
       "links": {},
-      "address": "0x5bA3d3999EfabcEB90EAcAdaf5Fb2c012f4C7Dff",
-      "transactionHash": "0x72d1dc62c549a39ebacd895cf1db4416620219a0cf62591a7c4cdf51fb149a7f"
+      "address": "0x5e7618cEB1B52d7e5BB669eB74fD325B2EaBC825",
+      "transactionHash": "0x541d075e028e4b2217fbe1bca3224555629ecdf8b65794ebc50efdf355ffd394"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-04-01T14:27:42.496Z",
+  "updatedAt": "2021-04-02T09:46:42.959Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

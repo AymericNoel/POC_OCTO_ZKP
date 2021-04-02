@@ -1,1 +1,1 @@
-# Proof Of Concept : Utilisation de Zero Knowledge Proof pour de la location de jardins
+# Utilisation de Zero Knowledge Proof pour de la location de jardins

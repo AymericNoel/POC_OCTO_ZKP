@@ -1,2 +1,5 @@
 /verification.key
 /proving.key
+/node_modules
+node_modules/.staging/@apollo/client-5097aa59/cache/inmemory/helpers.js
+/.eslintcache

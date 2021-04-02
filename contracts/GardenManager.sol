@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma experimental ABIEncoderV2; //voir si c'est necessaire //linter solidity
+pragma experimental ABIEncoderV2;
 pragma solidity ^0.6.1;
 import "./AdminManager.sol";
 import "./Verifier.sol";
