@@ -11,7 +11,7 @@
     "compile": "npx truffle compile --all",
     "eject": "react-scripts eject",
     "ganache": "npx ganache-cli",
-    "lint:sol": "npx solhint",
+    "lint:sol": "npx solhint 'contracts/**/*.sol'",
     "migrate": "npx truffle migrate --compile-all --reset",
     "start": "react-scripts start",
     "test:js": "react-scripts test",

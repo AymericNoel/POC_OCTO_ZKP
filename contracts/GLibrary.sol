@@ -25,14 +25,7 @@ library GLibrary{
         AccessCode accessCode;
     }
     struct AccessCode{
-        string hashCode;
+        bytes32 hashCode;
         string encryptedCode;
-    }
-
-    function IsRentOver(uint _beginning, uint _duration) public view returns (bool){
-        if(_beginning + _duration<= block.timestamp){
-            return true;
-        }
-        return false;
     }
 }

@@ -1,23 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma experimental ABIEncoderV2;
 pragma solidity ^0.6.1;
 import "./GardenManager.sol";
 import "./Verifier.sol";
 
-contract AdminManager{
-    //import area
-    Verifier public VerifierContract;
-    GardenManager public GManager;
-    event newDispute( uint _disputeIndex);
-
-    //admin area
-    mapping (address=>bool) ContractAdmins; 
-    address private deployer;
-    string public ContactP2P;
-    uint public MinApprovals;
-    uint public disputeProposalsCount;
-
-    //garden proposal area
+/// @title AdminManager contract
+/// @author Aymeric NOEL <aymeric.noel@octo.com>
+/// @notice Use this contract as a multisignature contract to validate garden and resolve dispute on @GardenManager contract
+contract AdminManager{   
     struct GardenProposal{
         uint gardenIndex;
         uint[2] secretHash;
@@ -25,9 +14,7 @@ contract AdminManager{
         address[] rejectProposal;
         bool isOpen;
     }
-    mapping (uint=>GardenProposal) public GardenProposals;
-    
-    //dispute proposal area
+   
     struct DisputeProposal{
         uint gardenIndex;
         uint ownerAmount;
@@ -37,8 +24,30 @@ contract AdminManager{
         bool isOpen;
         bool isReady;
     }
-    mapping(uint=>DisputeProposal) public DisputeProposals;
-   
+
+    //import area
+    Verifier public VerifierContract;
+    GardenManager public GManager;  
+
+    //administrators of this contract
+    mapping (address=>bool) private ContractAdmins; 
+
+    mapping (uint=>GardenProposal) public GardenProposals;
+    mapping (uint=>DisputeProposal) public DisputeProposals;
+
+    address private deployer;
+    string public ContactP2P;
+
+    //minimum approvals to valid a proposal
+    uint public MinApprovals;
+
+    //number of disputeProposal in the contract
+    uint public disputeProposalsCount;
+
+    /// @dev Emited when a new disputeProposal is created
+    /// @param _disputeIndex The id of the given disputeProposal
+    event NewDispute(uint _disputeIndex);
+
     constructor (address[] memory _contractAdmins,uint _minApprovals, address _verifierContract, string memory _contactP2P) public {
         for (uint i = 0; i < _contractAdmins.length; i++) {
             ContractAdmins[_contractAdmins[i]]=true;
@@ -49,7 +58,7 @@ contract AdminManager{
         ContactP2P = _contactP2P;
     }
 
-    modifier OnlyAdmin(){
+    modifier OnlyAdmin{
         require(ContractAdmins[msg.sender], "Only administrators should call");
         _;
     }
@@ -61,33 +70,49 @@ contract AdminManager{
         require(DisputeProposals[_disputeIndex].isOpen, "DisputeProposal should be open."); 
         _;   
     }
-    modifier OnlyDeployer(){
-        require(msg.sender==deployer);
+    modifier OnlyDeployer{
+        require(msg.sender==deployer,"Must be the deployer");
         _;
     }
-    function GetGardenProposalById(uint _gardenIndex)external view returns(GardenProposal memory){
-        return GardenProposals[_gardenIndex];
+    modifier OnlyGardenManager{
+        require(msg.sender== address(GManager),"Must be garden manager contract");
+        _;
     }
-    function GetDisputeProposalById(uint _disputeId)external view returns(DisputeProposal memory){
-        return DisputeProposals[_disputeId];
+
+    function getGardenProposalById(uint _gardenIndex) external view returns(uint gardenIndex,
+        uint[2] memory secretHash, address[] memory acceptProposal, address[] memory rejectProposal, bool isOpen){
+        GardenProposal memory garden=GardenProposals[_gardenIndex];
+        return(garden.gardenIndex,garden.secretHash,garden.acceptProposal,garden.rejectProposal,garden.isOpen);
     }
-    function AddGardenManagerAddress(address _address) external OnlyDeployer() returns(address){
+
+    function getDisputeProposalById(uint _disputeId)external view returns(uint gardenIndex,
+        uint ownerAmount,
+        uint tenantAmount,
+        uint balance,
+        address[] memory acceptProposal,
+        bool isOpen,
+        bool isReady){
+        DisputeProposal memory dispute = DisputeProposals[_disputeId];
+        return (dispute.gardenIndex,dispute.ownerAmount,dispute.tenantAmount,dispute.balance,dispute.acceptProposal,
+        dispute.isOpen,dispute.isReady);
+    }
+
+    function addGardenManagerAddress(address _address) external OnlyDeployer returns(address){
         GManager = GardenManager(_address);
         return _address;
     }
 
-    function ModifyVerifierContractAddress(address _verifierContract) external OnlyDeployer(){
+    function modifyVerifierContractAddress(address _verifierContract) external OnlyDeployer{
         VerifierContract = Verifier(_verifierContract);
-        GManager.ModifyVerifierContract(_verifierContract);
+        GManager.modifyVerifierContract(_verifierContract);
     }
 
-    function AddGarden(uint _gardenIndex, uint[2] memory _secret) public{
-        require(msg.sender== address(GManager));
+    function addGarden(uint _gardenIndex, uint[2] memory _secret)public OnlyGardenManager {
         GardenProposals[_gardenIndex] = GardenProposal(_gardenIndex,_secret,new address[](0),new address[](0),true);
     }
 
-    function AcceptGarden(uint _gardenIndex,uint[2] calldata _proofA, uint[2][2] calldata _proofB,
-            uint[2] calldata _proofC) external OnlyAdmin() OnlyValidGardenProposal(_gardenIndex){
+    function acceptGarden(uint _gardenIndex,uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+            uint[2] calldata _proofC) external OnlyAdmin OnlyValidGardenProposal(_gardenIndex){
         GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
         for (uint i = 0; i < proposal.acceptProposal.length; i++) {
@@ -100,12 +125,12 @@ contract AdminManager{
         require(VerifierContract.verifyTx(_proofA,_proofB,_proofC,proposal.secretHash), "Proof of secret invalid");
         proposal.acceptProposal.push(msg.sender);
         if(proposal.acceptProposal.length==MinApprovals){
-            GManager.AcceptGarden(_gardenIndex);
+            GManager.acceptGarden(_gardenIndex);
             proposal.isOpen=false;
         }
     }
 
-    function RejectGarden(uint _gardenIndex) external OnlyAdmin() OnlyValidGardenProposal(_gardenIndex){
+    function rejectGarden(uint _gardenIndex) external OnlyAdmin OnlyValidGardenProposal(_gardenIndex){
         GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
         for (uint i = 0; i < proposal.rejectProposal.length; i++) {
@@ -117,19 +142,23 @@ contract AdminManager{
         require(!alreadyVoted, "You should only vote once");
         proposal.rejectProposal.push(msg.sender);
         if(proposal.rejectProposal.length==MinApprovals){
-            GManager.RejectGarden(_gardenIndex);
+            GManager.rejectGarden(_gardenIndex);
             proposal.isOpen=false;
         }
     }
 
-    function AddDispute(uint _gardenIndex,uint _gardenBalance) public {
-        require(msg.sender== address(GManager));
+    function addDispute(uint _gardenIndex,uint _gardenBalance) public OnlyGardenManager {
         DisputeProposals[disputeProposalsCount] = DisputeProposal(_gardenIndex,0,0,_gardenBalance,new address[](0),true,false);
-        emit newDispute(disputeProposalsCount);
+        emit NewDispute(disputeProposalsCount);
         disputeProposalsCount++;
     }
 
-    function SetAmountForDispute(uint _disputeIndex,uint _ownerAmount, uint _tenantAmount) public OnlyDeployer() OnlyOpenDisputeProposal(_disputeIndex){
+    /// @dev use this function to set amount for the owner and the tenant in order to resolve the dispute.
+    /// Only the deployer should call this.
+    /// @param _disputeIndex the id of the disputeProposal
+    /// @param _ownerAmount the amount that should be given to the owner after dispute
+    /// @param _tenantAmount the amount that should be given to the tenant after dispute
+    function setAmountForDispute(uint _disputeIndex,uint _ownerAmount, uint _tenantAmount) public OnlyDeployer OnlyOpenDisputeProposal(_disputeIndex){
         DisputeProposal storage proposal = DisputeProposals[_disputeIndex];
         require(_ownerAmount+_tenantAmount==proposal.balance,"Incorrect amounts");
         if(proposal.acceptProposal.length !=0){
@@ -141,7 +170,7 @@ contract AdminManager{
         proposal.acceptProposal.push(msg.sender);
     }
 
-    function AcceptDispute(uint _disputeIndex) external OnlyAdmin() OnlyOpenDisputeProposal(_disputeIndex){
+    function acceptDispute(uint _disputeIndex) external OnlyAdmin OnlyOpenDisputeProposal(_disputeIndex){
         DisputeProposal storage proposal = DisputeProposals[_disputeIndex]; 
         require(proposal.isReady,"Amounts not set"); 
         bool alreadyVoted =false; 
@@ -154,7 +183,7 @@ contract AdminManager{
         require(!alreadyVoted, "You should only vote once");        
         proposal.acceptProposal.push(msg.sender);
         if(proposal.acceptProposal.length==MinApprovals){
-            GManager.CloseDispute(proposal.gardenIndex, proposal.ownerAmount,proposal.tenantAmount);
+            GManager.closeDispute(proposal.gardenIndex, proposal.ownerAmount,proposal.tenantAmount);
             proposal.isOpen=false;
         }
     }
