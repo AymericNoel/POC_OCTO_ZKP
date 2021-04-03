@@ -11,7 +11,8 @@
     "compile": "npx truffle compile --all",
     "eject": "react-scripts eject",
     "ganache": "npx ganache-cli",
-    "lint:sol": "npx solhint 'contracts/**/*.sol'",
+    "lint:sol": "npx solhint \"contracts/**/*.sol\"",
+    "lint:js":"npx eslint src/**/*.js",
     "migrate": "npx truffle migrate --compile-all --reset",
     "start": "react-scripts start",
     "test:js": "react-scripts test",
@@ -59,5 +60,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.23.1",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }

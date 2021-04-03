@@ -1,1 +1,2 @@
 contracts/Verifier.sol
+contracts/Migrations.sol
