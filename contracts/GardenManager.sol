@@ -55,7 +55,7 @@ contract GardenManager {
         garden.rents.length);
     }
 
-    function getRentByGardenAndRentId(uint _gardenIndex,uint _rentId) external view returns(int rate,
+    function getRentByGardenAndRentId(uint _gardenIndex, uint _rentId) external view returns(int rate,
         uint duration, 
         uint price,
         uint beginning,
@@ -86,6 +86,7 @@ contract GardenManager {
     /// @param _multipleOwners boolean that represents multiple owners for a garden or not
     /// @param _coOwners in case of multiple owners : all owners' addresses, could be empty
     function createGarden(uint[2] calldata _secretHash, string calldata _district,uint32 _area, string calldata _contact, GLibrary.GardenType _gardenType, bool _multipleOwners, address payable[] calldata _coOwners) external{
+        GardenCount++;
         GLibrary.Garden storage garden = AllGarden[GardenCount];
         garden.area=_area;
         garden.contact=_contact;
@@ -98,9 +99,8 @@ contract GardenManager {
             garden.multipleOwners=true;
             garden.coOwners=_coOwners;
         }
-        AManager.addGarden(GardenCount,_secretHash);
-        emit NewGarden(msg.sender,GardenCount);
-        GardenCount++;
+        AManager.addGarden(GardenCount, _secretHash);
+        emit NewGarden(msg.sender, GardenCount);        
     }
 
     /// @dev Use this function to update the contact of a garden.

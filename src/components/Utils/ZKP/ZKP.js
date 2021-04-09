@@ -1,10 +1,7 @@
-import React, { Component } from "react";
+import React from 'react';
 
-
-class ZKP extends Component {
-    render() {
-        return (<h1>ZKP</h1>);
-    }
+function ZKP() {
+  return <h1>ZKP</h1>;
 }
 
 export default ZKP;

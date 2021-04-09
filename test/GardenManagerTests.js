@@ -49,7 +49,7 @@ contract('Testing Garden Manager contract', function (accounts) {
         let [gardenIndex,gardenOwner]= GetGardenIndexAndOwner(result);
         let retrievedGarden = await GardenManager.getGardenById(gardenIndex);
         
-        assert.equal(gardenIndex,2);
+        assert.equal(gardenIndex,3);
         assert.equal(retrievedGarden.owner,gardenOwner);
         assert.isTrue(retrievedGarden.multipleOwners);
         assert.equal(retrievedGarden.coOwners[0],secondSigner);        
@@ -135,6 +135,7 @@ contract('Testing Garden Manager contract', function (accounts) {
         assert.equal(web3.utils.fromWei(retrievedRent.price),1);
         assert.equal(retrievedRent.rate,-1);
         assert.equal(retrievedRent.tenant,tenant);
+        assert.equal(retrievedRent.beginning,0);
     })
     it('Garden owner with valid proof could delete garden offer if tenant not responding and status "blocked"',async function () {
         let result = await GardenManager.createGarden(secretHash,"paris",567,"mail@contact.io",gardenType.Hobby,false,[]);
@@ -296,7 +297,7 @@ contract('Testing Garden Manager contract', function (accounts) {
 
         //only admin contract should close dispute :
         await tryCatch(GardenManager.closeDispute(gardenIndex,'2','1'),errTypes.revert);
-        await CloseDisputeByAdminContract(0,'2','1');
+        await CloseDisputeByAdminContract(1,'2','1');
 
         [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Free);
@@ -325,7 +326,7 @@ contract('Testing Garden Manager contract', function (accounts) {
     async function CloseDisputeByAdminContract(disputeIndex,ownerAmount,tenantAmount) {
         await AdminContract.setAmountForDispute(disputeIndex,web3.utils.toWei(ownerAmount),web3.utils.toWei(tenantAmount),{from:accounts[0]});
         for (let i = 1; i < minApprovals; i++) {
-            await AdminContract.acceptDispute(disputeIndex,{from:accounts[i]});            
+            await AdminContract.acceptDispute(disputeIndex,{from:accounts[i]});
         }
     }
     async function GetBalance(address) {

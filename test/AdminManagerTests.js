@@ -47,7 +47,7 @@ contract('Testing Admin Manager contract', function (accounts) {
         let retrievedId=await AddGardenProposal(secretHash);    
         let retrievedGardenProposal = await AdminContract.getGardenProposalById(retrievedId);
         assert.equal(retrievedGardenProposal.gardenIndex,retrievedId);
-        assert.equal(retrievedGardenProposal.gardenIndex,1);
+        assert.equal(retrievedGardenProposal.gardenIndex,2);
         assert.equal(retrievedGardenProposal.isOpen,true);
         
         //call not from gardenManager contract :
@@ -114,7 +114,7 @@ contract('Testing Admin Manager contract', function (accounts) {
         await tryCatch(AdminContract.addDispute(gardenIndex,2,{from:accounts[2]}),errTypes.revert);
 
         await AdminContract.addDispute(gardenIndex,2,{from:gardenManagerAddress});
-        let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(0);
+        let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(1);
         assert.equal(retrievedDisputeProposal.gardenIndex,gardenIndex);
         assert.isTrue(retrievedDisputeProposal.isOpen);
         assert.isFalse(retrievedDisputeProposal.isReady);
@@ -143,7 +143,7 @@ contract('Testing Admin Manager contract', function (accounts) {
         let retrievedDisputeProposal=await AdminContract.getDisputeProposalById(disputeId);
         assert.lengthOf(retrievedDisputeProposal.acceptProposal,2);
 
-        await AdminContract.setAmountForDispute(0,gardenBalance,0,{from: deployer});
+        await AdminContract.setAmountForDispute(1,gardenBalance,0,{from: deployer});
         retrievedDisputeProposal=await AdminContract.getDisputeProposalById(disputeId);
         assert.lengthOf(retrievedDisputeProposal.acceptProposal,1);
         assert.equal(retrievedDisputeProposal.ownerAmount,gardenBalance);
@@ -159,6 +159,6 @@ contract('Testing Admin Manager contract', function (accounts) {
         let gardenManagerAddress= accounts[8];
         await AdminContract.addGardenManagerAddress(gardenManagerAddress, {from:deployer});
         await AdminContract.addDispute(gardenIndex,gardenBalance,{from:gardenManagerAddress});
-        return 0;
+        return 1;
     }
 })

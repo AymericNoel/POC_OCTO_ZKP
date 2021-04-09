@@ -148,9 +148,9 @@ contract AdminManager{
     }
 
     function addDispute(uint _gardenIndex,uint _gardenBalance) public OnlyGardenManager {
-        DisputeProposals[disputeProposalsCount] = DisputeProposal(_gardenIndex,0,0,_gardenBalance,new address[](0),true,false);
-        emit NewDispute(disputeProposalsCount);
         disputeProposalsCount++;
+        DisputeProposals[disputeProposalsCount] = DisputeProposal(_gardenIndex,0,0,_gardenBalance,new address[](0),true,false);
+        emit NewDispute(disputeProposalsCount);        
     }
 
     /// @dev use this function to set amount for the owner and the tenant in order to resolve the dispute.
