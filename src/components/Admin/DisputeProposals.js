@@ -47,6 +47,11 @@ class DisputeProposals extends Component {
             field: 'isOpen',
             width: 50,
           },
+          {
+            label: ' ',
+            field: 'seeMore',
+            width: 50,
+          },
         ],
         rows: [],
       },
@@ -57,7 +62,7 @@ class DisputeProposals extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     try {
-      const disputeCount = await contracts.GardenContract.methods
+      const disputeCount = await contracts.AdminContract.methods
         .disputeProposalsCount()
         .call();
       if (Number(disputeCount) !== 0) {
@@ -69,7 +74,7 @@ class DisputeProposals extends Component {
           const row = {
             id: (
               <MDBBadge pill color='light-green darken-3' className='p-1 px-2'>
-                Proposition n° {proposal.id}
+                Litige n° {id}
               </MDBBadge>
             ),
             accepts: proposal.acceptProposal,
@@ -78,6 +83,21 @@ class DisputeProposals extends Component {
             balance: Web3.utils.fromWei(proposal.balance),
             isReady: proposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
             isOpen: proposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
+            seeMore: (
+              <button
+                style={{
+                  borderRadius: '8px',
+                  height: 'auto',
+                  fontSize: '11px',
+                }}
+                type='submit'
+                onClick={() => {
+                  this.props.toggle(proposal.gardenIndex);
+                }}
+              >
+                Voir jardin
+              </button>
+            ),
           };
           this.setState({ allProposals: [...this.state.allProposals, row] });
         }

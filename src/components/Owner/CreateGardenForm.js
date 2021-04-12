@@ -92,7 +92,7 @@ class CreateGardenForm extends Component {
           window.location.reload();
         });
     } catch (error) {
-      window.alert(error);
+      console.log('Unable to create garden ', error);
     }
   };
 

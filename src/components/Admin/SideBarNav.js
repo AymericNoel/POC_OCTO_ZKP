@@ -32,24 +32,10 @@ class SideBarNav extends Component {
           </div>
           <MDBCollapse id='collapse1' isOpen={collapseID}>
             <form>
-              <MDBInput
-                label='Type your email'
-                icon='envelope'
-                group
-                type='email'
-                validate
-                error='wrong'
-                success='right'
-              />
-              <MDBInput
-                label='Type your password'
-                icon='lock'
-                group
-                type='password'
-                validate
-              />
+              <MDBInput className='text-center' label='Id du jardin' validate size='sm' />
+              <MDBInput label='Preuve ZKP' validate size='sm' />
               <div className='text-center mb-2'>
-                <MDBBtn>Login</MDBBtn>
+                <MDBBtn size='sm'>Send</MDBBtn>
               </div>
             </form>
           </MDBCollapse>

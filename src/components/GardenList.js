@@ -2,7 +2,6 @@ import React from 'react';
 import {
   MDBCard,
   MDBCardBody,
-  MDBCardGroup,
   MDBCardText,
   MDBCol,
   MDBRow,
@@ -10,6 +9,7 @@ import {
   MDBCardHeader,
   MDBBadge,
   MDBAnimation,
+  MDBCardGroup,
 } from 'mdbreact';
 import { GardenType, GardenStatus } from '../utils/Enum';
 import './GardenList.css';
@@ -21,8 +21,8 @@ import './GardenList.css';
  */
 function Cards({ data, onClick }) {
   const allCards = data.map((garden) => (
-    <MDBAnimation reveal type='zoomIn'>
-      <MDBCard cascade>
+    <MDBAnimation reveal type='zoomIn' key={garden}>
+      <MDBCard style={{ width: '22rem' }} className='mb-3 mr-2' cascade>
         <MDBCardHeader color='success-color'>
           Jardin n°{garden.id}
         </MDBCardHeader>
@@ -30,7 +30,7 @@ function Cards({ data, onClick }) {
           <MDBBadge pill color='info'>
             Status : {GardenStatus[garden.status]}
           </MDBBadge>
-          <MDBRow style={{ 'margin-top': '1em' }}>
+          <MDBRow style={{ marginTop: '1em' }}>
             <MDBCol>
               <MDBCardText>Superficie :</MDBCardText>
             </MDBCol>
@@ -94,7 +94,7 @@ function Cards({ data, onClick }) {
 
 function GardenList(props) {
   return (
-    <MDBCardGroup column>
+    <MDBCardGroup>
       <Cards data={props.data} onClick={props.onClick} />
     </MDBCardGroup>
   );

@@ -1,6 +1,5 @@
 /node_modules
 /.eslintcache
-/src/contracts
+src/contracts
 /zokrates/proving.key
 /zokrates/verification.key
-.vscode/settings.json

@@ -19,11 +19,11 @@ function Routes() {
       <Route exact path='/' component={Dashboard} />
       <Route exact path='/Dashboard/:gardenId' component={DashboardRents} />
       <Route exact path='/Owner' component={Owner} />
-      <Route exact path='/Owner/:gardenId' component={OwnerRents} />
+      <Route path='/Owner/:gardenId' component={OwnerRents} />
       <Route exact path='/Admin' component={Admin} />
       <Route exact path='/Tenant' component={Tenant} />
-      <Route exact path='/Utils/hash' component={Hash} />
-      <Route exact path='/Utils/ZKP' component={ZKP} />
+      <Route path='/Utils/hash' component={Hash} />
+      <Route path='/Utils/ZKP' component={ZKP} />
       <Route
         render={wrongPath}
       />

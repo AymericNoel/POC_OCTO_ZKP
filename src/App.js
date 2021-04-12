@@ -54,7 +54,7 @@ function ConnectedButton(props) {
     </MDBTooltip>
   );
 }
-
+const activeStyleNavItem = { backgroundColor: '#689f38 ' };
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -109,11 +109,16 @@ export default class App extends Component {
     }
     return (
       <div id='page-container'>
-        <BlockchainContext.Provider
-          value={{ contractsPromise, accountsPromise, web3 }}
-        >
-          <Router>
-            <MDBNavbar color='light-green darken-3' dark expand='md'>
+        <Router>
+          <BlockchainContext.Provider
+            value={{ contractsPromise, accountsPromise, web3 }}
+          >
+            <MDBNavbar
+              color='light-green darken-3'
+              fixed='top'
+              dark
+              expand='md'
+            >
               <MDBNavbarBrand href='/'>
                 <MDBIcon fab icon='pagelines' />
                 <strong className='white-text'>Garden Manager</strong>
@@ -126,13 +131,15 @@ export default class App extends Component {
               >
                 <MDBNavbarNav left>
                   <MDBNavItem className='navBarCustom'>
-                    <MDBNavLink to='/Owner'>Proprietaire</MDBNavLink>
+                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Owner'>
+                      Proprietaire
+                    </MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
-                    <MDBNavLink to='/Tenant'>Locataire</MDBNavLink>
+                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Tenant'>Locataire</MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
-                    <MDBNavLink to='/Admin'>Admin</MDBNavLink>
+                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Admin'>Admin</MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
                     <MDBDropdown>
@@ -155,7 +162,7 @@ export default class App extends Component {
                 </MDBNavbarNav>
               </MDBCollapse>
             </MDBNavbar>
-            <main style={{ marginTop: '2rem' }} id='content-wrap'>
+            <main style={{ marginTop: '4.5rem' }} id='content-wrap'>
               <Routes />
             </main>
             <MDBFooter color='light-green lighten-4' id='footer'>
@@ -171,8 +178,8 @@ export default class App extends Component {
                 </a>
               </p>
             </MDBFooter>
-          </Router>
-        </BlockchainContext.Provider>
+          </BlockchainContext.Provider>{' '}
+        </Router>
       </div>
     );
   }

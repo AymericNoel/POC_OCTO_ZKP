@@ -31,6 +31,11 @@ class GardenProposals extends Component {
             field: 'isOpen',
             width: 50,
           },
+          {
+            label: ' ',
+            field: 'seeMore',
+            width: 50,
+          },
         ],
         rows: [],
       },
@@ -63,6 +68,21 @@ class GardenProposals extends Component {
             accepts: proposal.acceptProposal,
             rejects: proposal.rejectProposal,
             isOpen: proposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
+            seeMore: (
+              <button
+                style={{
+                  borderRadius: '8px',
+                  height: 'auto',
+                  fontSize: '11px',
+                }}
+                type='submit'
+                onClick={() => {
+                  this.props.toggle(id);
+                }}
+              >
+                Voir jardin
+              </button>
+            ),
           };
           this.setState({
             allProposals: {
@@ -87,7 +107,6 @@ class GardenProposals extends Component {
     if (isEmpty) {
       toDisp = <h6>Il n&apos;y a pas encore de propositions de jardins.</h6>;
     } else {
-      console.log(allProposals);
       toDisp = (
         <MDBDataTableV5
           infoLabel={['', '-', 'sur', '']}

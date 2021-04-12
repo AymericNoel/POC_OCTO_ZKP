@@ -82,7 +82,7 @@ class Owner extends Component {
     } else {
       toDisp = (
         <div className='text-center'>
-          <SectionContainer title='Vos jardins' className='p-2' noBorder>
+          <SectionContainer title='Vos jardins' className='p-2' noBorder noBottom>
             <GardenList data={allGardens} onClick={this.seeMore} />
           </SectionContainer>
         </div>
@@ -91,7 +91,7 @@ class Owner extends Component {
     return (
       <MDBContainer>
         {toDisp}
-        <MDBRow center className='mt-2'>
+        <MDBRow center className='my-3'>
           <MDBBtn color='success' onClick={this.toggle}>
             Créer un jardin
           </MDBBtn>

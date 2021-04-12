@@ -111,7 +111,7 @@ contract AdminManager{
         GardenProposals[_gardenIndex] = GardenProposal(_gardenIndex,_secret,new address[](0),new address[](0),true);
     }
 
-    function acceptGarden(uint _gardenIndex,uint[2] calldata _proofA, uint[2][2] calldata _proofB,
+    function acceptGarden(uint _gardenIndex, uint[2] calldata _proofA, uint[2][2] calldata _proofB,
             uint[2] calldata _proofC) external OnlyAdmin OnlyValidGardenProposal(_gardenIndex){
         GardenProposal storage proposal = GardenProposals[_gardenIndex];
         bool alreadyVoted =false;
