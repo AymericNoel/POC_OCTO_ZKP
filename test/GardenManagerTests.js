@@ -7,8 +7,7 @@ let tryCatch = require("./exceptions.js").tryCatch;
 let errTypes = require("./exceptions.js").errTypes;
 let gardenType = require("./Utils.js").GardenType;
 let gardenStatus = require("./Utils.js").GardenStatus;
-//hash of 256 bits separated in two hex then converted to number (required in input of zokrates proof) :
-const secretHash=["263561599766550617289250058199814760685", "65303172752238645975888084098459749904"];
+const secretHash = validProof.decimalHash;
 
 contract('Testing Garden Manager contract', function (accounts) {
     
@@ -243,7 +242,7 @@ contract('Testing Garden Manager contract', function (accounts) {
         let [gardenIndex,]= GetGardenIndexAndOwner(result);
         let tenant = accounts[2];
         let locationPrice ="2";
-        let locationDurationInSeconds = 3;
+        let locationDurationInSeconds = 4;
         let grade =4;
         let hashedCode = "0x4092503716f23af46b012c27a434e2e0416087dc42d853f57864fa289b6a9102";
 
@@ -257,7 +256,7 @@ contract('Testing Garden Manager contract', function (accounts) {
         let [,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedRent.rate,-1);
 
-        sleep(3000);
+        sleep(3500);
 
         //not the tenant :
         await GardenManager.addGradeToGarden(gardenIndex,grade,{from:accounts[0]});

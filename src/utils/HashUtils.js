@@ -2,11 +2,11 @@ const crypto = require('crypto');
 /* eslint prefer-template: "off" */
 
 const getDecimalFromString = (str) => {
-  let hex = '';
+  let decimals = '';
   for (let i = 0; i < str.length; i += 1) {
-    hex += '' + str.charCodeAt(i).toString(16);
+    decimals += '' + str.charCodeAt(i);
   }
-  return hex;
+  return decimals;
 };
 
 function hexStringToByte(str) {
@@ -23,7 +23,7 @@ function hexStringToByte(str) {
 }
 
 const getHashFromDecimal = (preimage) => {
-  const hexValue = preimage.toString(16).padStart(128, '0');
+  const hexValue = BigInt(preimage).toString(16).padStart(128, '0');
   return crypto
     .createHash('sha256')
     .update(hexStringToByte(hexValue))
@@ -50,10 +50,10 @@ const concatDecimalsArrayToHex = (array) => {
   return aHex + bHex;
 };
 
-const HashUtils = {
+module.exports.HashUtils = {
   concatDecimalsArrayToHex,
   getArrayOfDecimalsFromhash,
   getHashFromString,
+  getDecimalFromString,
+  getHashFromDecimal,
 };
-
-export default HashUtils;
