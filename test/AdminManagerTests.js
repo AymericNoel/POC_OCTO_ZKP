@@ -7,7 +7,6 @@ let tryCatch = require('./exceptions.js').tryCatch;
 let errTypes = require('./exceptions.js').errTypes;
 let gardenType = require('./Utils.js').GardenType;
 const secretHash = validProof.decimalHash;
-//validProof.se["263561599766550617289250058199814760685", "65303172752238645975888084098459749904"];
 
 contract('Testing Admin Manager contract', function (accounts) {
     const deployer = accounts[0];

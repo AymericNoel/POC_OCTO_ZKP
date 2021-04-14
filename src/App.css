@@ -13,15 +13,15 @@
 }
 #page-container {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 4.5rem);
 }
 
 #content-wrap {
-  padding-bottom: 3.5rem;    /* Footer height */
+  padding-bottom: 3.5rem;    /* superior or equal to Footer height */
 }
 
 #footer {
-  position: absolute;
+  position:absolute;
   bottom: 0;
   width: 100%;
   height: 3.5rem;            /* Footer height */

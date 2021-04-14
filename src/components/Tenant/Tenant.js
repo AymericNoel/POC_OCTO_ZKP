@@ -9,13 +9,15 @@ class Tenant extends Component {
   constructor() {
     super();
     this.state = {
-      account: '',
+      account: 'undefined',
     };
   }
 
   async componentDidMount() {
-    const account = (await this.context.accountsPromise)[0];
-    this.setState({ account });
+    const accounts = await this.context.accountsPromise;
+    if (accounts.length !== 0) {
+      this.setState({ account: accounts[0] });
+    }
   }
 
   render() {

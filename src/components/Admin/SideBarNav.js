@@ -1,12 +1,30 @@
 import React, { Component } from 'react';
-import { MDBBtn, MDBCollapse, MDBNav, MDBInput } from 'mdbreact';
+import { MDBBtn, MDBCollapse, MDBNav } from 'mdbreact';
+import BlockchainContext from '../../context/BlockchainContext';
+import AcceptGardenForm from './Forms/AcceptGardenForm';
+import DisputeSetupForm from './Forms/DisputeSetupForm';
+import ModifyVerifierContractForm from './Forms/ModifyVerifierContractForm';
+import RejectGardenForm from './Forms/RejectGardenForm';
+import ValidateDisputeForm from './Forms/ValidateDisputeForm';
+import './SideBarNav.css';
 
 class SideBarNav extends Component {
   constructor() {
     super();
     this.state = {
       collapseID: '',
+      contact: 'undefined',
     };
+  }
+
+  async componentDidMount() {
+    const contracts = await this.context.contractsPromise;
+    try {
+      const contact = await contracts.AdminContract.methods.ContactP2P().call();
+      this.setState({ contact });
+    } catch (error) {
+      console.error('Unable to retrieve admin contact from blockchain.', error);
+    }
   }
 
   toggleCollapse = (collapseID) => () => {
@@ -16,9 +34,13 @@ class SideBarNav extends Component {
   };
 
   render() {
-    const { collapseID } = this.state;
+    const { collapseID, contact } = this.state;
     return (
       <MDBNav className='flex-column'>
+        <div className='adminContact mb-3 w-100'>
+          <p className='text-center font-weight-bolder'>Admin contact : </p>
+          <p className='text-center font-weight-bold'>{contact}</p>
+        </div>
         <div className='text-center mb-2'>
           <MDBBtn
             size='sm'
@@ -30,18 +52,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <form>
-            <MDBInput
-              className='text-center'
-              label='Id du jardin'
-              validate
-              size='sm'
-            />
-            <MDBInput label='Preuve ZKP' validate size='sm' />
-            <div className='text-center mb-2'>
-              <MDBBtn size='sm'>Send</MDBBtn>
-            </div>
-          </form>
+          <AcceptGardenForm />
         </MDBCollapse>
         <div className='text-center mb-2'>
           <MDBBtn
@@ -54,7 +65,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <p>button 2</p>
+          <RejectGardenForm />
         </MDBCollapse>
         <div className='text-center mb-2'>
           <MDBBtn
@@ -63,11 +74,11 @@ class SideBarNav extends Component {
             onClick={this.toggleCollapse('collapse4')}
             className='w-100'
           >
-            Valider un litige
+            Fixer redistribution pour litige
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse4' isOpen={collapseID}>
-          <p>button 2</p>
+          <DisputeSetupForm />
         </MDBCollapse>
         <div className='text-center mb-2'>
           <MDBBtn
@@ -76,11 +87,11 @@ class SideBarNav extends Component {
             onClick={this.toggleCollapse('collapse3')}
             className='w-100'
           >
-            Fixer redistribution pour litige
+            Valider un litige
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <p>button 2</p>
+          <ValidateDisputeForm />
         </MDBCollapse>
         <div className='text-center mb-2'>
           <MDBBtn
@@ -93,10 +104,12 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse5' isOpen={collapseID}>
-          <p>verifier</p>
+          <ModifyVerifierContractForm />
         </MDBCollapse>
       </MDBNav>
     );
   }
 }
+SideBarNav.contextType = BlockchainContext;
+
 export default SideBarNav;

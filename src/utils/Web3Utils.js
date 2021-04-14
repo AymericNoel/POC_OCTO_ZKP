@@ -4,6 +4,10 @@ import GardenContract from '../contracts/GardenManager.json';
 
 const getAccounts = (_web3) => _web3.eth.getAccounts();
 
+const getEtherFromWei = (WeiAmount) => Number(Web3.utils.fromWei(WeiAmount));
+
+const getWeiFromEther = (number) => Web3.utils.toWei(number);
+
 const getContracts = async (_web3) => {
   const networkId = await _web3.eth.net.getId();
 
@@ -58,6 +62,8 @@ const Web3Utils = {
   getContracts,
   metamaskRefresh,
   getWeb3,
+  getEtherFromWei,
+  getWeiFromEther,
 };
 
 export default Web3Utils;

@@ -68,7 +68,7 @@ class DisputeProposals extends Component {
       if (Number(disputeCount) !== 0) {
         this.setState({ isEmpty: false });
         for (let id = 1; id <= disputeCount; id += 1) {
-          const proposal = await contracts.AdminContract.methods
+          const disputeProposal = await contracts.AdminContract.methods
             .getDisputeProposalById(id)
             .call();
           const row = {
@@ -77,12 +77,12 @@ class DisputeProposals extends Component {
                 Litige n° {id}
               </MDBBadge>
             ),
-            accepts: proposal.acceptProposal,
-            ownerAmount: Web3.utils.fromWei(proposal.ownerAmount),
-            tenantAmount: Web3.utils.fromWei(proposal.tenantAmount),
-            balance: Web3.utils.fromWei(proposal.balance),
-            isReady: proposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
-            isOpen: proposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
+            accepts: disputeProposal.acceptProposal,
+            ownerAmount: Web3.utils.fromWei(disputeProposal.ownerAmount),
+            tenantAmount: Web3.utils.fromWei(disputeProposal.tenantAmount),
+            balance: Web3.utils.fromWei(disputeProposal.balance),
+            isReady: disputeProposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
+            isOpen: disputeProposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
             seeMore: (
               <button
                 style={{
@@ -92,7 +92,7 @@ class DisputeProposals extends Component {
                 }}
                 type='submit'
                 onClick={() => {
-                  this.props.toggle(proposal.gardenIndex);
+                  this.props.toggle(disputeProposal.gardenIndex);
                 }}
               >
                 Voir jardin

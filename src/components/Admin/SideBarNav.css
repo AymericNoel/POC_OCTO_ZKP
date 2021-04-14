@@ -1,0 +1,10 @@
+.adminContact {
+  border-style: double;
+  border-color: #ff0000;
+}
+
+.inputFile:active{
+  border-style:ridge;
+  border-color: #47c947;
+  border-width: 3px
+}

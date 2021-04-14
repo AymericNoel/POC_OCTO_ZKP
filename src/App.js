@@ -151,7 +151,7 @@ export default class App extends Component {
                           Calcul de hash
                         </MDBDropdownItem>
                         <MDBDropdownItem href='/Utils/ZKP'>
-                          Explication du ZKP
+                          Exportation de preuve ZKP
                         </MDBDropdownItem>
                       </MDBDropdownMenu>
                     </MDBDropdown>
@@ -178,7 +178,7 @@ export default class App extends Component {
                 </a>
               </p>
             </MDBFooter>
-          </BlockchainContext.Provider>{' '}
+          </BlockchainContext.Provider>
         </Router>
       </div>
     );

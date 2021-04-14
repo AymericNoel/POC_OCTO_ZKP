@@ -8,7 +8,7 @@ import {
   MDBFormInline,
 } from 'mdbreact';
 import BlockchainContext from '../../context/BlockchainContext';
-import HashUtils from '../../utils/HashUtils';
+import { HashUtils } from '../../utils/HashUtils';
 
 class CreateGardenForm extends Component {
   constructor(props) {
