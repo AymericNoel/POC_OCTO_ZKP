@@ -41,7 +41,7 @@ class SideBarNav extends Component {
           <p className='text-center font-weight-bolder'>Admin contact : </p>
           <p className='text-center font-weight-bold'>{contact}</p>
         </div>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -54,7 +54,7 @@ class SideBarNav extends Component {
         <MDBCollapse id='collapse1' isOpen={collapseID}>
           <AcceptGardenForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -67,7 +67,7 @@ class SideBarNav extends Component {
         <MDBCollapse id='collapse2' isOpen={collapseID}>
           <RejectGardenForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -80,7 +80,7 @@ class SideBarNav extends Component {
         <MDBCollapse id='collapse4' isOpen={collapseID}>
           <DisputeSetupForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -93,7 +93,7 @@ class SideBarNav extends Component {
         <MDBCollapse id='collapse3' isOpen={collapseID}>
           <ValidateDisputeForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'

@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { MDBBtn, MDBCollapse, MDBNav } from 'mdbreact';
+import AcceptOfferForm from './Forms/AcceptOfferForm';
+import AddGradeForm from './Forms/AddGradeForm';
+import GetAccessCodeForm from './Forms/GetAccessCodeForm';
+import OpenDispute from './Forms/OpenDispute';
+import RefundForm from './Forms/RefundForm';
 
 class TenantSideNav extends Component {
   constructor() {
@@ -19,7 +24,7 @@ class TenantSideNav extends Component {
     const { collapseID } = this.state;
     return (
       <MDBNav className='flex-column'>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -30,9 +35,9 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <p>ter</p>
+          <AcceptOfferForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -43,9 +48,9 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <p>button 2</p>
+          <RefundForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -56,9 +61,9 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse4' isOpen={collapseID}>
-          <p>button 2</p>
+          <GetAccessCodeForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -69,9 +74,9 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse7' isOpen={collapseID}>
-          <p>button 2</p>
+          <AddGradeForm />
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -82,7 +87,7 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <p>button 2</p>
+          <OpenDispute />
         </MDBCollapse>
       </MDBNav>
     );

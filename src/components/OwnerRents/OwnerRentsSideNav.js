@@ -19,7 +19,7 @@ class OwnerRentsSideNav extends Component {
     const { collapseID } = this.state;
     return (
       <MDBNav className='flex-column'>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -32,7 +32,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse1' isOpen={collapseID}>
           <p>ter</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -45,7 +45,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse2' isOpen={collapseID}>
           <p>button 2</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -58,7 +58,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse4' isOpen={collapseID}>
           <p>button 2</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -71,7 +71,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse7' isOpen={collapseID}>
           <p>button 2</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -84,7 +84,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse3' isOpen={collapseID}>
           <p>button 2</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'
@@ -97,7 +97,7 @@ class OwnerRentsSideNav extends Component {
         <MDBCollapse id='collapse5' isOpen={collapseID}>
           <p>verifier</p>
         </MDBCollapse>
-        <div className='text-center mb-2'>
+        <div className='text-center mb-2 ml-n2'>
           <MDBBtn
             size='sm'
             color='success'

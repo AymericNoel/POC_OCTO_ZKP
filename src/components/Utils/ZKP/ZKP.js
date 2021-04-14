@@ -20,7 +20,7 @@ class ZKP extends Component {
     this.setState({ loading: true });
     console.log(this.state.preimage);
     try {
-      const proof = await computeProof(this.state.preimage.toString());
+      const proof = await computeProof(this.state.preimage);
       this.setState({ loading: false, proof });
       document.getElementById('downloadProof').click();
     } catch (error) {
@@ -66,6 +66,12 @@ class ZKP extends Component {
           >
             {' '}
           </a>
+        </SectionContainer>
+        <SectionContainer header='Comment ça marche ?'>
+          <p>explication ici</p>
+        </SectionContainer>
+        <SectionContainer header='Explication du fichier "proof.json"'>
+          <p>explication ici</p>
         </SectionContainer>
       </MDBContainer>
     );
