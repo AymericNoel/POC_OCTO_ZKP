@@ -55,6 +55,9 @@ class ModifyVerifierContractForm extends Component {
           name='verfierAddress'
           pattern='^0x[a-fA-F0-9]{40}$'
           onChange={this.changeHandler}
+          onInvalid={(e) => e.target.setCustomValidity(
+            'Adresse ethereum invalide',
+          )}
         />
         <div className='text-center mb-2'>
           <MDBBtn type='submit' size='sm'>

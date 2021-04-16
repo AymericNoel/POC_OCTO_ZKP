@@ -13,7 +13,7 @@ class SideBarNav extends Component {
     super();
     this.state = {
       collapseID: '',
-      contact: 'undefined',
+      contact: 'non défini',
     };
   }
 

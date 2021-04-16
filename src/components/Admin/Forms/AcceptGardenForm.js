@@ -49,7 +49,12 @@ class AcceptGardenForm extends Component {
     try {
       console.log(inputFile);
       await contracts.AdminContract.methods
-        .acceptGarden(gardenIndex, inputFile.proof.a, inputFile.proof.b, inputFile.proof.c)
+        .acceptGarden(
+          gardenIndex,
+          inputFile.proof.a,
+          inputFile.proof.b,
+          inputFile.proof.c,
+        )
         .send({ from: account })
         .then(() => {
           window.location.reload();
@@ -74,17 +79,21 @@ class AcceptGardenForm extends Component {
         />
 
         <div className='custom-file mb-4'>
-          <label className='custom-file-label inputFile' style={{ fontSize: '13px' }} htmlFor='inputGroupFile01'>
+          <input
+            type='file'
+            className='custom-file-input'
+            id='inputFile'
+            name='inputFile'
+            onChange={this.inputFileHandler}
+            required
+          />
+          <label
+            className='custom-file-label'
+            style={{ fontSize: '13px' }}
+            htmlFor='inputFile'
+            data-browse='Parcourir'
+          >
             {this.state.nameFile}
-            <input
-              type='file'
-              className='custom-file-input'
-              id='inputGroupFile01'
-              aria-describedby='inputGroupFileAddon01'
-              name='inputFile'
-              onChange={this.inputFileHandler}
-              required
-            />
           </label>
         </div>
 

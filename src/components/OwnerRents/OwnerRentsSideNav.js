@@ -82,7 +82,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <p>button 2</p>
+          <p>add access code form</p>
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
