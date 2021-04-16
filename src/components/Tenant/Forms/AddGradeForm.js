@@ -71,6 +71,9 @@ class AddGradeForm extends Component {
           max='5'
           step='1'
           onChange={this.changeHandler}
+          onInvalid={(e) => e.target.setCustomValidity(
+            'Note invalide. Doit être entre 1 et 5',
+          )}
         />
 
         <div className='text-center mb-2'>

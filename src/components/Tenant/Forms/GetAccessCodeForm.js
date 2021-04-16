@@ -9,6 +9,7 @@ class GetAccessCodeForm extends Component {
       contracts: undefined,
       account: undefined,
       gardenIndex: 0,
+      returnValue: null,
     };
   }
 
@@ -33,14 +34,40 @@ class GetAccessCodeForm extends Component {
     try {
       await contracts.GardenContract.methods
         .getAccessCodeByGardenId(gardenIndex)
-        .send({ from: account })
-        .then(() => {
-          window.location.reload();
+        .call({ from: account })
+        .then((result) => {
+          this.setState({ returnValue: result });
         });
     } catch (error) {
       console.error('Unable to get refund.', error);
     }
   };
+
+  displayCode = () => (
+    <div className='input-group input-group-sm'>
+      <input
+        type='text'
+        readOnly
+        className='form-control'
+        id='inlineFormInputGroup'
+        value={this.state.returnValue}
+      />
+      <div className='input-group-append'>
+        <button
+          className='btn-outline-secondary'
+          id='copy-button'
+          onClick={() => {
+            const btn = document.getElementById('copy-button');
+            btn.innerHTML = 'Copié';
+            navigator.clipboard.writeText(this.state.returnValue);
+          }}
+          type='button'
+        >
+          Copier
+        </button>
+      </div>
+    </div>
+  );
 
   render() {
     return (
@@ -65,6 +92,7 @@ class GetAccessCodeForm extends Component {
             Envoyer
           </MDBBtn>
         </div>
+        {this.state.returnValue !== null ? this.displayCode() : <div />}
       </form>
     );
   }
