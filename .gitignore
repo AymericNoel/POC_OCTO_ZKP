@@ -1,5 +1,5 @@
 /node_modules
 /.eslintcache
 src/contracts
-/zokrates/proving.key
-/zokrates/verification.key
+src/zokrates/proving.key
+src/zokrates/verification.key
