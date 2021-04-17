@@ -102,9 +102,16 @@ class ZKP extends Component {
           <ol className='mb-2' type='A'>
             <li className='mb-2'>
               Compilation : Cette étape consiste à compiler un fichier{' '}
-              <i>.zok</i> qui décrit de façon numérique ce qu&apos;on veut
-              prouver. Le langage Zok est un langage inventé par Zokrates
-              expressément dans ce but.
+              <a
+                target='_blank'
+                href='/hash_proof.txt'
+                className='text-decoration-none'
+              >
+                <i>.zok</i>
+              </a>{' '}
+              qui décrit de façon numérique ce qu&apos;on veut prouver. Le
+              langage Zok est un langage inventé par Zokrates expressément dans
+              ce but.
             </li>
             <li className='mb-2'>
               Setup de clés : Une clé de vérification et une clé de preuve sont

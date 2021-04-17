@@ -14,6 +14,9 @@ function Routes() {
   function wrongPath() {
     return <h1>Wrong Url ...</h1>;
   }
+
+  const reload = () => window.location.reload();
+
   return (
     <Switch>
       <Route exact path='/' component={Dashboard} />
@@ -24,9 +27,8 @@ function Routes() {
       <Route exact path='/Tenant' component={Tenant} />
       <Route path='/Utils/hash' component={Hash} />
       <Route path='/Utils/ZKP' component={ZKP} />
-      <Route
-        render={wrongPath}
-      />
+      <Route path='/hash_proof.txt' onEnter={reload} />
+      <Route render={wrongPath} />
     </Switch>
   );
 }
