@@ -19,7 +19,6 @@ class ZKP extends Component {
   submitHandler = async (event) => {
     event.preventDefault();
     this.setState({ loading: true });
-    console.log(this.state.preimage);
     try {
       const proof = await computeProof(this.state.preimage);
       this.setState({ loading: false, proof });

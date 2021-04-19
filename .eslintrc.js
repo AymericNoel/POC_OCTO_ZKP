@@ -19,7 +19,7 @@ module.exports = {
     'react',
   ],
   rules: {
-    'linebreak-style': ["error", "windows"],
+    'linebreak-style': ["error", (process.platform === "win32" ? "windows" : "unix")],
     'react/prefer-stateless-function': [1, { "ignorePureComponents": true }],
     'react/jsx-filename-extension': [1, { "extensions": [".js", ".jsx"] }],
     'react/jsx-no-bind':[1],
