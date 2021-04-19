@@ -20,6 +20,7 @@ library GLibrary{
         uint duration; 
         uint price;
         uint beginning;
+        bytes signature;
         uint balance;
         address payable tenant;
         AccessCode accessCode;

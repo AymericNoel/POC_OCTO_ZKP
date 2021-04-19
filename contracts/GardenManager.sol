@@ -13,6 +13,9 @@ contract GardenManager {
     uint public GardenCount;
     mapping (uint=>GLibrary.Garden) public AllGarden;
 
+    /// @dev This variable is used to retrieve the tenant's public key once he/she has signed this.
+    bytes7 public signMe = "sign me";
+
     /// @dev Emitted when a new garden is created
     /// @param _owner garden's owner
     /// @param _gardenIndex garden index
@@ -61,9 +64,10 @@ contract GardenManager {
         uint beginning,
         uint balance,
         address payable tenant,
+        bytes memory signature,
         bytes32 gardenHashCode){
         GLibrary.Rent memory rent = AllGarden[_gardenIndex].rents[_rentId];
-        return(rent.rate,rent.duration,rent.price,rent.beginning,rent.balance,rent.tenant,rent.accessCode.hashCode);
+        return(rent.rate,rent.duration,rent.price,rent.beginning,rent.balance,rent.tenant,rent.signature,rent.accessCode.hashCode);
     }
 
     function getAccessCodeByGardenId(uint _gardenIndex)external view returns(string memory encryptedCode){
@@ -181,13 +185,15 @@ contract GardenManager {
     /// @dev Use this function to accept a location offer.
     /// Caller must be the tenant.
     /// @param _gardenIndex the Id of the garden
-    function acceptGardenOffer(uint _gardenIndex)external payable{
+    /// @param _signature the signature of the parameter @signMe, used by the owner to encrypt garden access code
+    function acceptGardenOffer(uint _gardenIndex, bytes calldata _signature)external payable{
         GLibrary.Garden storage garden = AllGarden[_gardenIndex];
         GLibrary.Rent storage lastRent = getLastRentForGarden(_gardenIndex);
         require(garden.status== GLibrary.Status.Blocked, "No offer running");
         require(lastRent.tenant== msg.sender, "Not the correct tenant");
         require(lastRent.price <= msg.value, "Insufficient amount");
         lastRent.balance=msg.value;
+        lastRent.signature=_signature;
         garden.status=GLibrary.Status.CodeWaiting;
     }
 

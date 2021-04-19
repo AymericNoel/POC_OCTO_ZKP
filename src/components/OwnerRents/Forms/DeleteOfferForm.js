@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
-import Web3Utils from '../../../utils/Web3Utils';
+import computeProof from '../../../utils/ZkpUtils';
 
-class AcceptOfferForm extends Component {
+class DeleteOfferForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       contracts: undefined,
       account: undefined,
       gardenIndex: 0,
-      etherAmount: 0,
+      password: '',
+      loading: false,
     };
   }
 
@@ -23,38 +25,38 @@ class AcceptOfferForm extends Component {
 
   submitHandler = async (event) => {
     event.preventDefault();
-    await this.acceptGarden();
+    await this.deleteOffer();
   };
 
   changeHandler = (event) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  acceptGarden = async () => {
-    const { gardenIndex, contracts, account, etherAmount } = this.state;
-    const { web3 } = this.context;
+  deleteOffer = async () => {
+    const { gardenIndex, contracts, account, password } = this.state;
+    this.setState({ loading: true });
     try {
-      const messageToSign = await contracts.GardenContract.methods.signMe().call();
-      const signature = await web3.eth.personal.sign(messageToSign, account);
+      const proof = await computeProof(password);
       await contracts.GardenContract.methods
-        .acceptGardenOffer(gardenIndex, signature)
-        .send({ from: account, value: Web3Utils.getWeiFromEther(etherAmount) })
+        .updateGardenSecretHash(gardenIndex, proof.a, proof.b, proof.c)
+        .send({ from: account })
         .then(() => {
           window.location.reload();
         });
     } catch (error) {
-      console.error('Unable to accept garden.', error);
+      console.error('Unable to delete offer.', error);
+      this.setState({ loading: false });
     }
   };
 
   render() {
+    const { loading } = this.state;
     return (
       <form onSubmit={this.submitHandler}>
         <p className='text-center' style={{ fontSize: '13px' }}>
-          Le nombre d&apos;éthers à envoyer doit être supérieur ou égal au
-          montant fixé au préalable. Une signature sera demandée, elle servira
-          plus tard au propriétaire pour crypté le code d&apos;accès au jardin pour
-          qu&apos;il soit uniquement décryptable par le locataire, vous.
+          La suppresion d&apos;une offre ne peut avoir lieu uniquement si le
+          locataire ne l&apos;a pas accepté. Une preuve de validité de mot de passe
+          sera générée. Cette étape peut durer ~ 45 secondes.
         </p>
         <MDBInput
           className='text-center'
@@ -62,18 +64,20 @@ class AcceptOfferForm extends Component {
           type='number'
           validate
           required
+          min='1'
+          step='1'
           size='sm'
           name='gardenIndex'
           onChange={this.changeHandler}
         />
         <MDBInput
           className='text-center'
-          label='Ethers à envoyer'
-          type='number'
+          label='Mot de passe'
+          type='password'
           validate
           required
           size='sm'
-          name='etherAmount'
+          name='password'
           onChange={this.changeHandler}
         />
 
@@ -81,11 +85,12 @@ class AcceptOfferForm extends Component {
           <MDBBtn type='submit' size='sm'>
             Envoyer
           </MDBBtn>
+          {loading ? <Spinner /> : <div />}
         </div>
       </form>
     );
   }
 }
-AcceptOfferForm.contextType = BlockchainContext;
+DeleteOfferForm.contextType = BlockchainContext;
 
-export default AcceptOfferForm;
+export default DeleteOfferForm;

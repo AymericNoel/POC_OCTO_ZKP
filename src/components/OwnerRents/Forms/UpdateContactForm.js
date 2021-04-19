@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
 import BlockchainContext from '../../../context/BlockchainContext';
-import Web3Utils from '../../../utils/Web3Utils';
 
-class AcceptOfferForm extends Component {
+class UpdateContactForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       contracts: undefined,
       account: undefined,
       gardenIndex: 0,
-      etherAmount: 0,
+      newContact: '',
     };
   }
 
@@ -23,57 +22,49 @@ class AcceptOfferForm extends Component {
 
   submitHandler = async (event) => {
     event.preventDefault();
-    await this.acceptGarden();
+    await this.updateContact();
   };
 
   changeHandler = (event) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  acceptGarden = async () => {
-    const { gardenIndex, contracts, account, etherAmount } = this.state;
-    const { web3 } = this.context;
+  updateContact = async () => {
+    const { gardenIndex, contracts, account, newContact } = this.state;
     try {
-      const messageToSign = await contracts.GardenContract.methods.signMe().call();
-      const signature = await web3.eth.personal.sign(messageToSign, account);
       await contracts.GardenContract.methods
-        .acceptGardenOffer(gardenIndex, signature)
-        .send({ from: account, value: Web3Utils.getWeiFromEther(etherAmount) })
+        .updateGardenContact(gardenIndex, newContact)
+        .send({ from: account })
         .then(() => {
           window.location.reload();
         });
     } catch (error) {
-      console.error('Unable to accept garden.', error);
+      console.error('Unable to update contact.', error);
     }
   };
 
   render() {
     return (
       <form onSubmit={this.submitHandler}>
-        <p className='text-center' style={{ fontSize: '13px' }}>
-          Le nombre d&apos;éthers à envoyer doit être supérieur ou égal au
-          montant fixé au préalable. Une signature sera demandée, elle servira
-          plus tard au propriétaire pour crypté le code d&apos;accès au jardin pour
-          qu&apos;il soit uniquement décryptable par le locataire, vous.
-        </p>
         <MDBInput
           className='text-center'
           label='Id du jardin'
           type='number'
           validate
           required
+          min='1'
+          step='1'
           size='sm'
           name='gardenIndex'
           onChange={this.changeHandler}
         />
         <MDBInput
           className='text-center'
-          label='Ethers à envoyer'
-          type='number'
+          label='Nouvelle coordonnée'
+          type='text'
           validate
           required
-          size='sm'
-          name='etherAmount'
+          name='newContact'
           onChange={this.changeHandler}
         />
 
@@ -86,6 +77,6 @@ class AcceptOfferForm extends Component {
     );
   }
 }
-AcceptOfferForm.contextType = BlockchainContext;
+UpdateContactForm.contextType = BlockchainContext;
 
-export default AcceptOfferForm;
+export default UpdateContactForm;

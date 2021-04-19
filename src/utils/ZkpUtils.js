@@ -6,6 +6,12 @@ import Abi from '../zokrates/abi.json';
 import ProvingKey from '!!binary-loader!../zokrates/provingKey.bin';
 import Program from '!!binary-loader!../zokrates/program.bin';
 
+/**
+ * Compute ZKP proof from hash preimage.
+ *
+ * @param {string} preimage The hash input
+ * @returns {Promise<Object>} Proof
+ */
 const computeProof = (preimage) => new Promise((resolve) => {
   initialize().then(async (zokratesProvider) => {
     const abi = JSON.stringify(Abi);
@@ -15,7 +21,9 @@ const computeProof = (preimage) => new Promise((resolve) => {
     const artifacts = { program, abi };
     const decimalPreimage = HashUtils.getDecimalFromString(preimage);
     const computedHash = HashUtils.getHashFromDecimal(decimalPreimage);
-    const decimalHashArray = HashUtils.getArrayOfDecimalsFromhash(computedHash);
+    const decimalHashArray = HashUtils.getArrayOfDecimalsFromhash(
+      computedHash,
+    );
 
     // Computation
     const computationResult = zokratesProvider.computeWitness(artifacts, [

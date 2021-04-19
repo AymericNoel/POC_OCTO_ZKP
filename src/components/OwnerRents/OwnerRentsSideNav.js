@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
 import { MDBBtn, MDBCollapse, MDBNav } from 'mdbreact';
+import AddDisputeForm from './Forms/AddDisputeForm';
+import AddOfferForm from './Forms/AddOfferForm';
+import DeleteOfferForm from './Forms/DeleteOfferForm';
+import GetBackEthersForm from './Forms/GetBackEthersForm';
+import UpdateContactForm from './Forms/UpdateContactForm';
+import UpdateSecretForm from './Forms/UpdateSecretForm';
+import AddAccessCodeForm from './Forms/AddAccessCodeForm';
 
 class OwnerRentsSideNav extends Component {
   constructor() {
@@ -30,7 +37,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <p>ter</p>
+          <UpdateContactForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -43,7 +50,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <p>button 2</p>
+          <UpdateSecretForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -56,7 +63,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse4' isOpen={collapseID}>
-          <p>button 2</p>
+          <AddOfferForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -69,7 +76,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse7' isOpen={collapseID}>
-          <p>button 2</p>
+          <DeleteOfferForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -82,7 +89,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <p>add access code form</p>
+          <AddAccessCodeForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -95,7 +102,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse5' isOpen={collapseID}>
-          <p>verifier</p>
+          <AddDisputeForm />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -108,7 +115,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse6' isOpen={collapseID}>
-          <p>verifier</p>
+          <GetBackEthersForm />
         </MDBCollapse>
       </MDBNav>
     );

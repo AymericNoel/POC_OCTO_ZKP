@@ -170,11 +170,11 @@ contract('Testing Garden Manager contract', function (accounts) {
         await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(3),web3.utils.toWei('1', 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
         
         //not the tenant :
-        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,{from: accounts[2],value:web3.utils.toWei('1', 'ether')}),errTypes.revert);
+        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: accounts[2],value:web3.utils.toWei('1', 'ether')}),errTypes.revert);
         //ether amount insufficient :
-        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('0.5', 'ether')}),errTypes.revert);
+        await tryCatch(GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei('0.5', 'ether')}),errTypes.revert);
         
-        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1', 'ether')});
+        await GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei('1', 'ether')});
         let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.CodeWaiting);
         assert.equal(web3.utils.fromWei(retrievedRent.balance),1);
@@ -195,7 +195,7 @@ contract('Testing Garden Manager contract', function (accounts) {
         assert.equal(retrievedGarden.status,gardenStatus.Blocked);
         await tryCatch(GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode",{from: gardenOwner}),errTypes.revert);
 
-        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei('1.5', 'ether')});
+        await GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei('1.5', 'ether')});
         await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode",{from: gardenOwner});
         [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.Location);
@@ -219,7 +219,7 @@ contract('Testing Garden Manager contract', function (accounts) {
 
         await ValidateGardenByAdminContract(gardenIndex);
         await GardenManager.proposeGardenOffer(gardenIndex,tenant,GetSecondsFromDays(2) ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
 
         let [retrievedGarden,retrievedRent] = await GetGardenAndRentsById(gardenIndex);
         assert.equal(retrievedGarden.status,gardenStatus.CodeWaiting);
@@ -248,7 +248,7 @@ contract('Testing Garden Manager contract', function (accounts) {
 
         await ValidateGardenByAdminContract(gardenIndex);
         await GardenManager.proposeGardenOffer(gardenIndex,tenant,locationDurationInSeconds ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
         await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode");
         
         //location not over :
@@ -284,7 +284,7 @@ contract('Testing Garden Manager contract', function (accounts) {
 
         await ValidateGardenByAdminContract(gardenIndex);
         await GardenManager.proposeGardenOffer(gardenIndex,tenant,3 ,web3.utils.toWei(locationPrice, 'ether'),validProof.proof.a,validProof.proof.b,validProof.proof.c);
-        await GardenManager.acceptGardenOffer(gardenIndex,{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
+        await GardenManager.acceptGardenOffer(gardenIndex,"0xf",{from: tenant,value:web3.utils.toWei(locationPrice, 'ether')});
         await GardenManager.addAccessCodeToGarden(gardenIndex,validProof.proof.a,validProof.proof.b,validProof.proof.c,hashedCode,"EncryptedAccessCode");
         
         let tenantBalanceBeforeRefund= await GetBalance(tenant);

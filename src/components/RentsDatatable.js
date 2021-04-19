@@ -55,12 +55,12 @@ class DisputeProposals extends Component {
     const { gardenId } = this.props;
     const contracts = await this.context.contractsPromise;
     try {
-      const proposal = await contracts.GardenContract.methods
+      const garden = await contracts.GardenContract.methods
         .getGardenById(gardenId)
         .call();
-      if (Number(proposal.rentLength) !== 0) {
+      if (Number(garden.rentLength) !== 0) {
         this.setState({ isEmpty: false });
-        for (let id = 0; id < proposal.rentLength; id += 1) {
+        for (let id = 0; id < garden.rentLength; id += 1) {
           const rent = await contracts.GardenContract.methods
             .getRentByGardenAndRentId(id)
             .call();
