@@ -1,29 +1,21 @@
-const path = require('path');
-const fs = require('fs');
-const { initialize } = require('zokrates-js/node');
-const { HashUtils } = require('./HashUtils');
+import { initialize } from 'zokrates-js';
+import { HashUtils } from './HashUtils';
+import Abi from '../zokrates/abi.json';
 
-const zokratesDir = '../../zokrates';
+/* eslint-disable import/no-webpack-loader-syntax, import/no-unresolved */
+import ProvingKey from '!!binary-loader!../zokrates/provingKey.bin';
+import Program from '!!binary-loader!../zokrates/program.bin';
 
 const computeProof = (preimage) => new Promise((resolve) => {
-  initialize().then((zokratesProvider) => {
-    const provingKey = fs.readFileSync(
-      path.join(__dirname, `${zokratesDir}/proving.key`),
-    );
-    const program = fs.readFileSync(
-      path.join(__dirname, `${zokratesDir}/program`),
-    );
-    const abi = fs.readFileSync(
-      path.join(__dirname, `${zokratesDir}/abi.json`),
-      'utf8',
-    );
-    const artifacts = { program, abi };
+  initialize().then(async (zokratesProvider) => {
+    const abi = JSON.stringify(Abi);
+    const program = Buffer.from(Program, 'binary');
+    const provingKey = Buffer.from(ProvingKey, 'binary');
 
+    const artifacts = { program, abi };
     const decimalPreimage = HashUtils.getDecimalFromString(preimage);
     const computedHash = HashUtils.getHashFromDecimal(decimalPreimage);
-    const decimalHashArray = HashUtils.getArrayOfDecimalsFromhash(
-      computedHash,
-    );
+    const decimalHashArray = HashUtils.getArrayOfDecimalsFromhash(computedHash);
 
     // Computation
     const computationResult = zokratesProvider.computeWitness(artifacts, [
@@ -45,4 +37,4 @@ const computeProof = (preimage) => new Promise((resolve) => {
   });
 });
 
-module.exports = computeProof;
+export default computeProof;
