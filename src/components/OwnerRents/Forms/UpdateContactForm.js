@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class UpdateContactForm extends Component {
@@ -36,16 +37,27 @@ class UpdateContactForm extends Component {
         .updateGardenContact(gardenIndex, newContact)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add('Contact mis à jour avec succès', {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to update contact.', error);
+      this.props.toastManager.add(
+        'Impossible de mettre à jour le contact, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
   render() {
     return (
       <form onSubmit={this.submitHandler}>
+        <p className='text-center' style={{ fontSize: '13px' }}>
+          Seul le déployeur des smarts contracts peut mettre à jour le contact
+          administrateur.
+        </p>
         <MDBInput
           className='text-center'
           label='Id du jardin'
@@ -79,4 +91,4 @@ class UpdateContactForm extends Component {
 }
 UpdateContactForm.contextType = BlockchainContext;
 
-export default UpdateContactForm;
+export default withToastManager(UpdateContactForm);

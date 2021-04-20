@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBDataTableV5 } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 
 class TenantDatatable extends Component {
@@ -108,7 +109,12 @@ class TenantDatatable extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error('Error while retrieving gardens from blockchain', error);
+      this.props.toastManager.add(
+        'Impossible de récupérer les locations depuis la blockchain',
+        {
+          appearance: 'error',
+        },
+      );
     }
   }
 
@@ -139,4 +145,4 @@ class TenantDatatable extends Component {
 
 TenantDatatable.contextType = BlockchainContext;
 
-export default TenantDatatable;
+export default withToastManager(TenantDatatable);

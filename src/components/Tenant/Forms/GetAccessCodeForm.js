@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withToastManager } from 'react-toast-notifications';
 import { MDBInput, MDBBtn } from 'mdbreact';
 import BlockchainContext from '../../../context/BlockchainContext';
 
@@ -39,7 +40,12 @@ class GetAccessCodeForm extends Component {
           this.setState({ returnValue: result });
         });
     } catch (error) {
-      console.error('Unable to get refund.', error);
+      this.props.toastManager.add(
+        'Impossible de récupérer le code d&apos;accès au jardin, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -99,4 +105,4 @@ class GetAccessCodeForm extends Component {
 }
 GetAccessCodeForm.contextType = BlockchainContext;
 
-export default GetAccessCodeForm;
+export default withToastManager(GetAccessCodeForm);

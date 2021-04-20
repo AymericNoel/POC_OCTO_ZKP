@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
 import computeProof from '../../../utils/ZkpUtils';
@@ -41,10 +42,20 @@ class DeleteOfferForm extends Component {
         .updateGardenSecretHash(gardenIndex, proof.a, proof.b, proof.c)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            `L&apos;offre du jardin ${gardenIndex} a été supprimé avec succès`,
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to delete offer.', error);
+      this.props.toastManager.add(
+        `Impossible de supprimer l&apos;offre du jardin ${gardenIndex}, veuillez réessayer`,
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -55,8 +66,8 @@ class DeleteOfferForm extends Component {
       <form onSubmit={this.submitHandler}>
         <p className='text-center' style={{ fontSize: '13px' }}>
           La suppresion d&apos;une offre ne peut avoir lieu uniquement si le
-          locataire ne l&apos;a pas accepté. Une preuve de validité de mot de passe
-          sera générée. Cette étape peut durer ~ 45 secondes.
+          locataire ne l&apos;a pas accepté. Une preuve de validité de mot de
+          passe sera générée. Cette étape peut durer ~ 45 secondes.
         </p>
         <MDBInput
           className='text-center'
@@ -93,4 +104,4 @@ class DeleteOfferForm extends Component {
 }
 DeleteOfferForm.contextType = BlockchainContext;
 
-export default DeleteOfferForm;
+export default withToastManager(DeleteOfferForm);

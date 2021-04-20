@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBBtn, MDBCollapse, MDBNav } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 import AcceptGardenForm from './Forms/AcceptGardenForm';
 import DisputeSetupForm from './Forms/DisputeSetupForm';
@@ -23,7 +24,12 @@ class SideBarNav extends Component {
       const contact = await contracts.AdminContract.methods.ContactP2P().call();
       this.setState({ contact });
     } catch (error) {
-      console.error('Unable to retrieve admin contact from blockchain.', error);
+      this.props.toastManager.add(
+        'Impossible de récupérer le contact "administrateur"',
+        {
+          appearance: 'error',
+        },
+      );
     }
   }
 
@@ -112,4 +118,4 @@ class SideBarNav extends Component {
 }
 SideBarNav.contextType = BlockchainContext;
 
-export default SideBarNav;
+export default withToastManager(SideBarNav);

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
 import { HashUtils } from '../../../utils/HashUtils';
@@ -56,10 +57,20 @@ class UpdateSecretForm extends Component {
         )
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            'Mot de passe mis à jour avec succès',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to change password.', error);
+      this.props.toastManager.add(
+        'Impossible de mettre à jour le mot de passe, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -117,4 +128,4 @@ class UpdateSecretForm extends Component {
 }
 UpdateSecretForm.contextType = BlockchainContext;
 
-export default UpdateSecretForm;
+export default withToastManager(UpdateSecretForm);

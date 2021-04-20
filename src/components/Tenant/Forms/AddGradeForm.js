@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withToastManager } from 'react-toast-notifications';
 import { MDBInput, MDBBtn } from 'mdbreact';
 import BlockchainContext from '../../../context/BlockchainContext';
 
@@ -36,10 +37,17 @@ class AddGradeForm extends Component {
         .addGradeToGarden(gardenIndex, grade)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add('Note ajoutée avec succès', {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to add grade.', error);
+      this.props.toastManager.add(
+        'Impossible de rajouter une note, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -71,9 +79,9 @@ class AddGradeForm extends Component {
           max='5'
           step='1'
           onChange={this.changeHandler}
-          onInvalid={(e) => e.target.setCustomValidity(
-            'Note invalide. Doit être entre 1 et 5',
-          )}
+          onInvalid={(e) =>
+            e.target.setCustomValidity('Note invalide. Doit être entre 1 et 5')
+          }
         />
 
         <div className='text-center mb-2'>
@@ -87,4 +95,4 @@ class AddGradeForm extends Component {
 }
 AddGradeForm.contextType = BlockchainContext;
 
-export default AddGradeForm;
+export default withToastManager(AddGradeForm);

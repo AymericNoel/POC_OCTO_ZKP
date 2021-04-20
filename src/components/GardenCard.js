@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useToasts } from 'react-toast-notifications';
 import {
   MDBCardBody,
   MDBCard,
@@ -15,6 +16,7 @@ import { GardenStatus, GardenType } from '../utils/Enum';
  * @param {gardenId} number - garden Id of chosen garden
  */
 function GardenCard({ gardenId }) {
+  const { addToast } = useToasts();
   const { contractsPromise } = useContext(BlockchainContext);
 
   const [garden, setGarden] = useState(undefined);
@@ -41,6 +43,10 @@ function GardenCard({ gardenId }) {
         };
         setGarden(row);
       } catch (error) {
+        addToast(
+          `Impossible de charger le jardin ${gardenId}, veuillez réessayer`,
+          { appearance: 'error' },
+        );
         setGarden(null);
       }
     }

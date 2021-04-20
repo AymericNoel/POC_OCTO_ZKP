@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class ModifyVerifierContractForm extends Component {
@@ -35,10 +36,17 @@ class ModifyVerifierContractForm extends Component {
         .modifyVerifierContractAddress(verfierAddress)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(`Adresse modifiée avec succès`, {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to modify verifier address.', error);
+      this.props.toastManager.add(
+        'Impossible de modifier l&apos;adresse du contrat Verifier, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -55,9 +63,7 @@ class ModifyVerifierContractForm extends Component {
           name='verfierAddress'
           pattern='^0x[a-fA-F0-9]{40}$'
           onChange={this.changeHandler}
-          onInvalid={(e) => e.target.setCustomValidity(
-            'Adresse ethereum invalide',
-          )}
+          onInvalid={(e) => e.target.setCustomValidity('Adresse ethereum invalide')}
         />
         <div className='text-center mb-2'>
           <MDBBtn type='submit' size='sm'>
@@ -70,4 +76,4 @@ class ModifyVerifierContractForm extends Component {
 }
 ModifyVerifierContractForm.contextType = BlockchainContext;
 
-export default ModifyVerifierContractForm;
+export default withToastManager(ModifyVerifierContractForm);

@@ -32,6 +32,7 @@
     "react-dom": "17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "react-toast-notifications": "^2.4.3",
     "solhint": "^3.3.4",
     "solidity-docgen": "^0.5.11",
     "truffle": "^5.3.0",
@@ -66,6 +67,7 @@
     ]
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "binary-loader": "0.0.1",
     "eslint": "^7.23.0",
     "eslint-config-airbnb": "^18.2.1",

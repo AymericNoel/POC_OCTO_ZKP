@@ -1,7 +1,7 @@
 import { MDBContainer } from 'mdbreact';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 import GardenList from '../GardenList';
 
@@ -51,7 +51,12 @@ class Dashboard extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error('Error while retrieving gardens from blockchain', error);
+      this.props.toastManager.add(
+        'Impossible de récupérer les données depuis la blockchain',
+        {
+          appearance: 'error',
+        },
+      );
     }
   }
 
@@ -95,4 +100,4 @@ class Dashboard extends Component {
 
 Dashboard.contextType = BlockchainContext;
 
-export default Dashboard;
+export default withToastManager(Dashboard);

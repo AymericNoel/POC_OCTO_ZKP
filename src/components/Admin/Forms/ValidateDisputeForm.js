@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class ValidateDisputeForm extends Component {
@@ -35,10 +36,17 @@ class ValidateDisputeForm extends Component {
         .acceptDispute(disputeId)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(`Litige n°${disputeId} validé`, {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to validate dispute.', error);
+      this.props.toastManager.add(
+        'Impossible de valider le litige, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -67,4 +75,4 @@ class ValidateDisputeForm extends Component {
 }
 ValidateDisputeForm.contextType = BlockchainContext;
 
-export default ValidateDisputeForm;
+export default withToastManager(ValidateDisputeForm);

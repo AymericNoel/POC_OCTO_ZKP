@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBDataTableV5, MDBBadge } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 
 class GardenProposals extends Component {
@@ -94,9 +95,11 @@ class GardenProposals extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error(
-        'Error while retrieving garden proposals from blockchain',
-        error,
+      this.props.toastManager.add(
+        'Impossible de récupérer les propositions de jardins depuis la blockchain',
+        {
+          appearance: 'error',
+        },
       );
     }
   }
@@ -125,4 +128,4 @@ class GardenProposals extends Component {
 
 GardenProposals.contextType = BlockchainContext;
 
-export default GardenProposals;
+export default withToastManager(GardenProposals);

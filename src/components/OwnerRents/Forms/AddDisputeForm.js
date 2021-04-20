@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class AddDisputeForm extends Component {
@@ -35,10 +36,20 @@ class AddDisputeForm extends Component {
         .addDispute(gardenIndex)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            'Litige ouvert avec succès, contactez les administrateurs',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to add dispute.', error);
+      this.props.toastManager.add(
+        'Impossible d&apos;ouvrir un litige, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -74,4 +85,4 @@ class AddDisputeForm extends Component {
 }
 AddDisputeForm.contextType = BlockchainContext;
 
-export default AddDisputeForm;
+export default withToastManager(AddDisputeForm);

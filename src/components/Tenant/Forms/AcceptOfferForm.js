@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 import Web3Utils from '../../../utils/Web3Utils';
 
@@ -34,16 +35,28 @@ class AcceptOfferForm extends Component {
     const { gardenIndex, contracts, account, etherAmount } = this.state;
     const { web3 } = this.context;
     try {
-      const messageToSign = await contracts.GardenContract.methods.signMe().call();
+      const messageToSign = await contracts.GardenContract.methods
+        .signMe()
+        .call();
       const signature = await web3.eth.personal.sign(messageToSign, account);
       await contracts.GardenContract.methods
         .acceptGardenOffer(gardenIndex, signature)
         .send({ from: account, value: Web3Utils.getWeiFromEther(etherAmount) })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            'Proposition acceptée. La location débutera lorsque le propriétaire aura rajouter le code d&apos;accès au jardin',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to accept garden.', error);
+      this.props.toastManager.add(
+        'Impossible de d&apos;accepter la proposition, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -53,8 +66,8 @@ class AcceptOfferForm extends Component {
         <p className='text-center' style={{ fontSize: '13px' }}>
           Le nombre d&apos;éthers à envoyer doit être supérieur ou égal au
           montant fixé au préalable. Une signature sera demandée, elle servira
-          plus tard au propriétaire pour crypté le code d&apos;accès au jardin pour
-          qu&apos;il soit uniquement décryptable par le locataire, vous.
+          plus tard au propriétaire pour crypté le code d&apos;accès au jardin
+          pour qu&apos;il soit uniquement décryptable par le locataire, vous.
         </p>
         <MDBInput
           className='text-center'
@@ -88,4 +101,4 @@ class AcceptOfferForm extends Component {
 }
 AcceptOfferForm.contextType = BlockchainContext;
 
-export default AcceptOfferForm;
+export default withToastManager(AcceptOfferForm);

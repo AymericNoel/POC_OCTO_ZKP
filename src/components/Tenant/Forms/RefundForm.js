@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class RefundForm extends Component {
@@ -35,10 +36,17 @@ class RefundForm extends Component {
         .getRefundBeforeLocation(gardenIndex)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add('Transaction effectuée avec succès', {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to get refund.', error);
+      this.props.toastManager.add(
+        'Impossible d&apos;obtenir un remboursement, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -71,4 +79,4 @@ class RefundForm extends Component {
 }
 RefundForm.contextType = BlockchainContext;
 
-export default RefundForm;
+export default withToastManager(RefundForm);

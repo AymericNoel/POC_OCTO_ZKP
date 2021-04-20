@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MDBBtn, MDBContainer, MDBInput, MDBIcon } from 'mdbreact';
-
+import { withToastManager } from 'react-toast-notifications';
 import computeProof from '../../../utils/ZkpUtils';
 import SectionContainer from '../../SectionContainer';
 import Spinner from '../../Spinner';
@@ -24,7 +24,12 @@ class ZKP extends Component {
       this.setState({ loading: false, proof });
       document.getElementById('downloadProof').click();
     } catch (error) {
-      console.error('could not export proof', error);
+      this.props.toastManager.add(
+        'Impossible d&aposexporter la preuve, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -177,4 +182,4 @@ class ZKP extends Component {
   }
 }
 
-export default ZKP;
+export default withToastManager(ZKP);

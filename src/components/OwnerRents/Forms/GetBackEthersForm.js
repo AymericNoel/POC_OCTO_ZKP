@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
 import computeProof from '../../../utils/ZkpUtils';
@@ -46,10 +47,20 @@ class GetBackEthersForm extends Component {
         )
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            `Transaction confirmée`,
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to get back ethers.', error);
+      this.props.toastManager.add(
+        'Impossible de retirer les éthers, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -99,4 +110,4 @@ class GetBackEthersForm extends Component {
 }
 GetBackEthersForm.contextType = BlockchainContext;
 
-export default GetBackEthersForm;
+export default withToastManager(GetBackEthersForm);

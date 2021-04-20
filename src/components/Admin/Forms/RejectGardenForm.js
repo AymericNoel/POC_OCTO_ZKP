@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class RejectGardenForm extends Component {
@@ -35,10 +36,14 @@ class RejectGardenForm extends Component {
         .rejectGarden(gardenIndex)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(`Jardin ${gardenIndex} rejeté`, {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to reject garden.', error);
+      this.props.toastManager.add('Impossible de rejeter le jardin', {
+        appearance: 'error',
+      });
     }
   };
 
@@ -67,4 +72,4 @@ class RejectGardenForm extends Component {
 }
 RejectGardenForm.contextType = BlockchainContext;
 
-export default RejectGardenForm;
+export default withToastManager(RejectGardenForm);

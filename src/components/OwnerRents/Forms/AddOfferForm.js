@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
 import computeProof from '../../../utils/ZkpUtils';
@@ -48,7 +49,6 @@ class AddOfferForm extends Component {
       price,
       radioButton,
     } = this.state;
-    console.log('button ', radioButton);
     this.setState({ loading: true });
     try {
       const durationInSeconds = radioButton === 1 ? duration * 60 * 60 : duration * 60 * 60 * 24;
@@ -65,10 +65,20 @@ class AddOfferForm extends Component {
         )
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            'Offre ajoutée avec succès. En attente du paiement du locataire',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to add offer.', error);
+      this.props.toastManager.add(
+        'Impossible de rajouter une offre de location, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -188,4 +198,4 @@ class AddOfferForm extends Component {
 }
 AddOfferForm.contextType = BlockchainContext;
 
-export default AddOfferForm;
+export default withToastManager(AddOfferForm);

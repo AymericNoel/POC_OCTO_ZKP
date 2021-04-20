@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBDataTableV5 } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../context/BlockchainContext';
 
 class DisputeProposals extends Component {
@@ -99,7 +100,12 @@ class DisputeProposals extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error('Error while retrieving rents from blockchain', error);
+      this.props.toastManager.add(
+        'Impossible de charger les locations depuis la blockchain',
+        {
+          appearance: 'error',
+        },
+      );
     }
   }
 
@@ -126,4 +132,4 @@ class DisputeProposals extends Component {
 
 DisputeProposals.contextType = BlockchainContext;
 
-export default DisputeProposals;
+export default withToastManager(DisputeProposals);

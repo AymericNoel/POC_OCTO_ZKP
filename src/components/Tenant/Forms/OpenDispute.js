@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class RefundForm extends Component {
@@ -35,10 +36,20 @@ class RefundForm extends Component {
         .addDispute(gardenIndex)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(
+            'litige ouvert avec succès, veuillez prendre contact avec les administrateurs',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.error('Unable to add dispute.', error);
+      this.props.toastManager.add(
+        'Impossible d&apos;ajouter un litige, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -74,4 +85,4 @@ class RefundForm extends Component {
 }
 RefundForm.contextType = BlockchainContext;
 
-export default RefundForm;
+export default withToastManager(RefundForm);

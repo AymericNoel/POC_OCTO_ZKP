@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBBtn, MDBContainer, MDBRow } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 import GardenList from '../GardenList';
 import CreateGardenForm from './CreateGardenForm';
@@ -10,7 +11,6 @@ class Owner extends Component {
     super();
     this.state = {
       isEmpty: true,
-      // contracts: undefined,
       allGardens: [],
       modal: false,
     };
@@ -54,7 +54,12 @@ class Owner extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error('Error while retrieving gardens from blockchain', error);
+      this.props.toastManager.add(
+        'Impossible de récupérer les jardins depuis la blockchain',
+        {
+          appearance: 'error',
+        },
+      );
     }
   }
 
@@ -82,7 +87,12 @@ class Owner extends Component {
     } else {
       toDisp = (
         <div className='text-center'>
-          <SectionContainer title='Vos jardins' className='p-2' noBorder noBottom>
+          <SectionContainer
+            title='Vos jardins'
+            className='p-2'
+            noBorder
+            noBottom
+          >
             <GardenList data={allGardens} onClick={this.seeMore} />
           </SectionContainer>
         </div>
@@ -103,4 +113,4 @@ class Owner extends Component {
 }
 Owner.contextType = BlockchainContext;
 
-export default Owner;
+export default withToastManager(Owner);

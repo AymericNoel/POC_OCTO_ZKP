@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { MDBDataTableV5, MDBBadge } from 'mdbreact';
-import Web3 from 'web3';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
+import Web3Utils from '../../utils/Web3Utils';
 
 class DisputeProposals extends Component {
   constructor() {
@@ -78,11 +79,15 @@ class DisputeProposals extends Component {
               </MDBBadge>
             ),
             accepts: disputeProposal.acceptProposal,
-            ownerAmount: Web3.utils.fromWei(disputeProposal.ownerAmount),
-            tenantAmount: Web3.utils.fromWei(disputeProposal.tenantAmount),
-            balance: Web3.utils.fromWei(disputeProposal.balance),
-            isReady: disputeProposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
-            isOpen: disputeProposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
+            ownerAmount: Web3Utils.getEtherFromWei(disputeProposal.ownerAmount),
+            tenantAmount: Web3Utils.getEtherFromWei(
+              disputeProposal.tenantAmount,
+            ),
+            balance: Web3Utils.getEtherFromWei(disputeProposal.balance),
+            isReady:
+              disputeProposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
+            isOpen:
+              disputeProposal.isOpen.toString() === 'true' ? 'Oui' : 'Non',
             seeMore: (
               <button
                 style={{
@@ -104,9 +109,11 @@ class DisputeProposals extends Component {
       }
     } catch (error) {
       this.setState({ isEmpty: true });
-      console.error(
-        'Error while retrieving garden proposals from blockchain',
-        error,
+      this.props.toastManager.add(
+        'Impossible de récupérer les litiges depuis la blockchain',
+        {
+          appearance: 'error',
+        },
       );
     }
   }
@@ -135,4 +142,4 @@ class DisputeProposals extends Component {
 
 DisputeProposals.contextType = BlockchainContext;
 
-export default DisputeProposals;
+export default withToastManager(DisputeProposals);

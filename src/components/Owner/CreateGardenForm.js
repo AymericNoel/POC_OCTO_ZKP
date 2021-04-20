@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withToastManager } from 'react-toast-notifications';
 import {
   MDBInput,
   MDBModalBody,
@@ -89,10 +90,20 @@ class CreateGardenForm extends Component {
         .send({ from: account })
         .then(() => {
           this.props.toggle();
-          window.location.reload();
+          this.props.toastManager.add(
+            'Jardin crée avec succès',
+            {
+              appearance: 'success',
+            },
+          );
         });
     } catch (error) {
-      console.log('Unable to create garden ', error);
+      this.props.toastManager.add(
+        'Impossible de créer un jardin, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -223,4 +234,4 @@ class CreateGardenForm extends Component {
 }
 CreateGardenForm.contextType = BlockchainContext;
 
-export default CreateGardenForm;
+export default withToastManager(CreateGardenForm);

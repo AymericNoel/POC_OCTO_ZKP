@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
 class DisputeSetupForm extends Component {
@@ -55,10 +56,17 @@ class DisputeSetupForm extends Component {
         .setAmountForDispute(disputeId, tenantAmount, ownerAmount)
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(`Montants pour litige acceptés`, {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to reject garden.', error);
+      this.props.toastManager.add(
+        'Impossible de rejeter le jardin, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
     }
   };
 
@@ -126,4 +134,4 @@ class DisputeSetupForm extends Component {
 }
 DisputeSetupForm.contextType = BlockchainContext;
 
-export default DisputeSetupForm;
+export default withToastManager(DisputeSetupForm);

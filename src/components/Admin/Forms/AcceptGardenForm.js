@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
+import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 import '../SideBarNav.css';
 
@@ -18,7 +19,6 @@ class AcceptGardenForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
     this.setState({ contracts, account });
   }
 
@@ -37,7 +37,17 @@ class AcceptGardenForm extends Component {
       const fileReader = new FileReader();
       fileReader.readAsText(event.target.files[0], 'UTF-8');
       fileReader.onload = (e) => {
-        this.setState({ inputFile: JSON.parse(e.target.result), nameFile });
+        try {
+          const jsonProof = JSON.parse(e.target.result);
+          this.setState({ inputFile: jsonProof, nameFile });
+        } catch (error) {
+          this.props.toastManager.add(
+            'Impossible de telecharger la preuve, veuillez vérifier votre fichier',
+            {
+              appearance: 'error',
+            },
+          );
+        }
       };
     } catch (error) {
       this.setState({ nameFile: 'Télécharger la preuve' });
@@ -47,7 +57,6 @@ class AcceptGardenForm extends Component {
   validateGarden = async () => {
     const { gardenIndex, inputFile, contracts, account } = this.state;
     try {
-      console.log(inputFile);
       await contracts.AdminContract.methods
         .acceptGarden(
           gardenIndex,
@@ -57,10 +66,14 @@ class AcceptGardenForm extends Component {
         )
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add(`Jardin ${gardenIndex} validé`, {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to validate garden ', error);
+      this.props.toastManager.add('Impossible de valider le jardin', {
+        appearance: 'error',
+      });
     }
   };
 
@@ -108,4 +121,4 @@ class AcceptGardenForm extends Component {
 }
 AcceptGardenForm.contextType = BlockchainContext;
 
-export default AcceptGardenForm;
+export default withToastManager(AcceptGardenForm);

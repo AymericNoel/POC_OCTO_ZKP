@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { MDBInput, MDBBtn } from 'mdbreact';
 import EthCrypto from 'eth-crypto';
+import { withToastManager } from 'react-toast-notifications';
 import Spinner from '../../Spinner';
 import BlockchainContext from '../../../context/BlockchainContext';
 import computeProof from '../../../utils/ZkpUtils';
 import { HashUtils } from '../../../utils/HashUtils';
 
-class UpdateSecretForm extends Component {
+class AddAccessCodeForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -80,10 +81,17 @@ class UpdateSecretForm extends Component {
         )
         .send({ from: account })
         .then(() => {
-          window.location.reload();
+          this.props.toastManager.add('Code ajouté avec succès', {
+            appearance: 'success',
+          });
         });
     } catch (error) {
-      console.error('Unable to add garden code.', error);
+      this.props.toastManager.add(
+        'Impossible d&apos;ajouter un code d&apos;accès au jardin, veuillez réessayer',
+        {
+          appearance: 'error',
+        },
+      );
       this.setState({ loading: false });
     }
   };
@@ -153,6 +161,6 @@ class UpdateSecretForm extends Component {
     );
   }
 }
-UpdateSecretForm.contextType = BlockchainContext;
+AddAccessCodeForm.contextType = BlockchainContext;
 
-export default UpdateSecretForm;
+export default withToastManager(AddAccessCodeForm);
