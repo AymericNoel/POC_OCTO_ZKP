@@ -13,6 +13,7 @@ import {
 } from 'mdbreact';
 import { GardenType, GardenStatus } from '../utils/Enum';
 import './GardenList.css';
+import { HashUtils } from '../utils/HashUtils';
 
 /**
  * Component to create list of gardens via cards
@@ -54,6 +55,20 @@ function Cards({ data, onClick }) {
               <MDBCardText>{garden.contact}</MDBCardText>
             </MDBCol>
           </MDBRow>
+          {garden.secretHash !== null ? (
+            <MDBRow>
+              <MDBCol>
+                <MDBCardText>Hash du mot de passe :</MDBCardText>
+              </MDBCol>
+              <MDBCol>
+                <MDBCardText>
+                  {HashUtils.concatDecimalsArrayToHex(garden.secretHash)}
+                </MDBCardText>
+              </MDBCol>
+            </MDBRow>
+          ) : (
+            <div />
+          )}
           <MDBRow>
             <MDBCol>
               <MDBCardText>Nombre de locations :</MDBCardText>

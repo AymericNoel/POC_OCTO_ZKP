@@ -37,7 +37,7 @@ class Dashboard extends Component {
             gardenType: proposal.gardenType,
             district: proposal.district,
             area: proposal.area,
-            secretHash: proposal.secretHash,
+            secretHash: null,
             contact: proposal.contact,
             status: proposal.status,
             rentLength: proposal.rentLength,
