@@ -32,7 +32,7 @@ ____
 
 This project aims to use Zero Knowledge Proof protocol to implement a Two Factor Authentication on blockchain.
 
-<u>How does it work?</u>
+<ins>How does it work?</ins>
 
 Users of the site store the hash of their password onchain, then when they perform sensitive operations such as withdrawing ethers from the smart contract, they have to provide the ZKP proof that they know the pre-image of the hash and thus their password.
 This way, even if a dishonest person manages to steal a user's ethereum private key, the thief will not be able to perform sensitive operations.
@@ -60,9 +60,10 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 You need to have node and npm installed on your computer.
-* Node
-<br/>
+* Node <br/>
 You can download node from the official [website](https://nodejs.org/en/download/).
+
+
 * Npm
   ```sh
   npm install npm@latest -g
