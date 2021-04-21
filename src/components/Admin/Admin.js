@@ -19,6 +19,8 @@ class Admin extends Component {
     this.state = {
       modal: false,
       gardenId: 0,
+      gardenUpdated: false,
+      disputeUpdated: false,
     };
   }
 
@@ -30,13 +32,28 @@ class Admin extends Component {
     });
   };
 
+  updateGardenProposals = () => {
+    this.setState((prevState) => ({
+      gardenUpdated: !prevState.gardenUpdated,
+    }));
+  };
+
+  updateDisputeProposals = () => {
+    this.setState((prevState) => ({
+      disputeUpdated: !prevState.disputeUpdated,
+    }));
+  };
+
   render() {
-    const { gardenId, modal } = this.state;
+    const { gardenId, modal, gardenUpdated, disputeUpdated } = this.state;
     return (
       <MDBContainer className='ml-1'>
         <MDBRow>
           <MDBCol size='3'>
-            <SideBarNav />
+            <SideBarNav
+              updateGardens={this.updateGardenProposals}
+              updateDisputes={this.updateDisputeProposals}
+            />
           </MDBCol>
           <MDBCol size='9'>
             <SectionContainer
@@ -44,10 +61,10 @@ class Admin extends Component {
               header='Propositions de jardin'
               noBorder
             >
-              <GardenProposals toggle={this.toggle} />
+              <GardenProposals toggle={this.toggle} updated={gardenUpdated} />
             </SectionContainer>
             <SectionContainer header='Litiges' noBorder noBottom>
-              <DisputeProposals toggle={this.toggle} />
+              <DisputeProposals toggle={this.toggle} updated={disputeUpdated} />
             </SectionContainer>
           </MDBCol>
           <MDBModal isOpen={modal} toggle={this.toggle} size='lg'>

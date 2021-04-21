@@ -14,8 +14,9 @@ import { GardenStatus, GardenType } from '../utils/Enum';
 /**
  * Component to create unique garden via card
  * @param {gardenId} number - garden Id of chosen garden
+ * @param {garden} [object=null] - garden Id of chosen garden
  */
-function GardenCard({ gardenId }) {
+function GardenCard({ gardenId, gardenData = null }) {
   const { addToast } = useToasts();
   const { contractsPromise } = useContext(BlockchainContext);
 
@@ -25,9 +26,11 @@ function GardenCard({ gardenId }) {
     async function loadGarden() {
       const contracts = await contractsPromise;
       try {
-        const proposal = await contracts.GardenContract.methods
-          .getGardenById(gardenId)
-          .call();
+        const proposal = gardenData === null
+          ? await contracts.GardenContract.methods
+            .getGardenById(gardenId)
+            .call()
+          : gardenData;
         const row = {
           id: proposal.id,
           owner: proposal.owner,
@@ -58,7 +61,7 @@ function GardenCard({ gardenId }) {
       <MDBCardBody>
         <MDBRow center>
           <MDBBadge pill color='info'>
-            Status : {GardenStatus[garden?.status]}
+            Etat : {GardenStatus[garden?.status]}
           </MDBBadge>
         </MDBRow>
         <MDBRow style={{ marginTop: '1em' }}>

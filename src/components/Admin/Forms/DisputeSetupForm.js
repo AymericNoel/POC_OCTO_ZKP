@@ -51,18 +51,24 @@ class DisputeSetupForm extends Component {
         .call();
       const tenantAmount = currentTenantStepIndex * 0.01 * Number(disputeProposal.balance);
       const ownerAmount = Number(disputeProposal.balance) - tenantAmount;
-
       await contracts.AdminContract.methods
-        .setAmountForDispute(disputeId, tenantAmount, ownerAmount)
+        .setAmountForDispute(disputeId, `${ownerAmount}`, `${tenantAmount}`)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateDisputes();
           this.props.toastManager.add(`Montants pour litige acceptés`, {
             appearance: 'success',
           });
         });
     } catch (error) {
+      console.log(error);
       this.props.toastManager.add(
-        'Impossible de rejeter le jardin, veuillez réessayer',
+        'Impossible de fixer un montant pour le litige, veuillez réessayer',
         {
           appearance: 'error',
         },

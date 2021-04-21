@@ -58,7 +58,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <AcceptGardenForm />
+          <AcceptGardenForm updateGardens={this.props.updateGardens} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -71,7 +71,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <RejectGardenForm />
+          <RejectGardenForm updateGardens={this.props.updateGardens} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -84,7 +84,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse4' isOpen={collapseID}>
-          <DisputeSetupForm />
+          <DisputeSetupForm updateDisputes={this.props.updateDisputes} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -97,7 +97,7 @@ class SideBarNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <ValidateDisputeForm />
+          <ValidateDisputeForm updateDisputes={this.props.updateDisputes} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn

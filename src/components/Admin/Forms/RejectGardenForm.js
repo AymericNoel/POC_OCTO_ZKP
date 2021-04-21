@@ -35,8 +35,14 @@ class RejectGardenForm extends Component {
       await contracts.AdminContract.methods
         .rejectGarden(gardenIndex)
         .send({ from: account })
-        .then(() => {
-          this.props.toastManager.add(`Jardin ${gardenIndex} rejeté`, {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateGardens();
+          this.props.toastManager.add(`Jardin ${gardenIndex} rejeté avec succès`, {
             appearance: 'success',
           });
         });
@@ -57,6 +63,7 @@ class RejectGardenForm extends Component {
           validate
           required
           size='sm'
+          value={this.state.gardenIndex}
           name='gardenIndex'
           onChange={this.changeHandler}
         />

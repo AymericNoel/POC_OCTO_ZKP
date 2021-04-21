@@ -32,11 +32,12 @@ class DisputeProposals extends Component {
             label: 'Montant pour locataire',
             field: 'tenantAmount',
             sort: 'asc',
-            width: 136,
+            width: 50,
           },
           {
             label: 'Montant à répartir',
             field: 'balance',
+            width: 50,
           },
           {
             label: 'Montant répartis',
@@ -61,11 +62,22 @@ class DisputeProposals extends Component {
 
   /* eslint no-await-in-loop: "off" */
   async componentDidMount() {
+    await this.fetchData();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (prevProps.updated !== this.props.updated) {
+      await this.fetchData();
+    }
+  }
+
+  async fetchData() {
     const contracts = await this.context.contractsPromise;
     try {
       const disputeCount = await contracts.AdminContract.methods
         .disputeProposalsCount()
         .call();
+      const rows = [];
       if (Number(disputeCount) !== 0) {
         this.setState({ isEmpty: false });
         for (let id = 1; id <= disputeCount; id += 1) {
@@ -104,8 +116,14 @@ class DisputeProposals extends Component {
               </button>
             ),
           };
-          this.setState({ allProposals: [...this.state.allProposals, row] });
+          rows.push(row);
         }
+        this.setState({
+          allProposals: {
+            columns: [...this.state.allProposals.columns],
+            rows,
+          },
+        });
       }
     } catch (error) {
       this.setState({ isEmpty: true });

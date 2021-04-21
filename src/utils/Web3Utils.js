@@ -6,7 +6,7 @@ const getAccounts = (_web3) => _web3.eth.getAccounts();
 
 const getEtherFromWei = (WeiAmount) => Number(Web3.utils.fromWei(WeiAmount));
 
-const getWeiFromEther = (number) => Web3.utils.toWei(number);
+const getWeiFromEther = (string) => Web3.utils.toWei(string.toString());
 
 const getContracts = async (_web3) => {
   const networkId = await _web3.eth.net.getId();

@@ -65,7 +65,13 @@ class AcceptGardenForm extends Component {
           inputFile.proof.c,
         )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateGardens();
           this.props.toastManager.add(`Jardin ${gardenIndex} validé`, {
             appearance: 'success',
           });
@@ -88,6 +94,7 @@ class AcceptGardenForm extends Component {
           required
           size='sm'
           name='gardenIndex'
+          value={this.state.gardenIndex}
           onChange={this.changeHandler}
         />
 

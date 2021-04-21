@@ -22,6 +22,7 @@ class TenantSideNav extends Component {
 
   render() {
     const { collapseID } = this.state;
+    const { updateLocations } = this.props;
     return (
       <MDBNav className='flex-column'>
         <div className='text-center mb-2 ml-n2'>
@@ -35,7 +36,7 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <AcceptOfferForm />
+          <AcceptOfferForm updateLocations={updateLocations} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -48,7 +49,7 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <RefundForm />
+          <RefundForm updateLocations={updateLocations} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -74,7 +75,7 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse7' isOpen={collapseID}>
-          <AddGradeForm />
+          <AddGradeForm updateLocations={updateLocations} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -87,7 +88,7 @@ class TenantSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <OpenDispute />
+          <OpenDispute updateLocations={updateLocations} />
         </MDBCollapse>
       </MDBNav>
     );

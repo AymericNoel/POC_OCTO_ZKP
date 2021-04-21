@@ -36,7 +36,13 @@ class AddGradeForm extends Component {
       await contracts.GardenContract.methods
         .addGradeToGarden(gardenIndex, grade)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateLocations();
           this.props.toastManager.add('Note ajoutée avec succès', {
             appearance: 'success',
           });

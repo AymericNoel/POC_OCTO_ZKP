@@ -1,49 +1,55 @@
 import React, { Component } from 'react';
-import { MDBDataTableV5 } from 'mdbreact';
+import {
+  MDBDataTableV5,
+  MDBModalBody,
+  MDBModalHeader,
+  MDBModal,
+} from 'mdbreact';
 import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../context/BlockchainContext';
+import Web3Utils from '../utils/Web3Utils';
+import GardenCard from './GardenCard';
 
-class DisputeProposals extends Component {
+class RentsDatatable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isEmpty: true,
+      modal: false,
+      gardenInfo: {},
+      gardenId: 0,
       allRents: {
         columns: [
           {
             label: 'Locataire',
             field: 'tenant',
-            width: 136,
           },
           {
             label: 'Durée',
             field: 'duration',
-            width: 136,
           },
           {
-            label: 'Status',
+            label: 'Etat',
             field: 'status',
-            width: 136,
+            width: 300,
           },
           {
             label: 'Prix',
             field: 'price',
-            width: 136,
           },
           {
             label: 'Balance',
             field: 'balance',
-            width: 136,
+            width: 300,
           },
           {
             label: 'Note',
             field: 'rate',
-            width: 136,
           },
           {
-            label: 'Code Hashé',
-            field: 'gardenHashCode',
-            width: 136,
+            label: ' ',
+            field: 'seeMore',
+            sort: 'disabled',
           },
         ],
         rows: [],
@@ -53,9 +59,29 @@ class DisputeProposals extends Component {
 
   /* eslint no-await-in-loop: "off" */
   async componentDidMount() {
+    await this.fetchData();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.updated !== prevProps.updated) {
+      await this.fetchData();
+    }
+  }
+
+  toggle = (gardenInfo, gardenId) => {
+    const { modal } = this.state;
+    this.setState({
+      modal: !modal,
+      gardenInfo,
+      gardenId,
+    });
+  };
+
+  async fetchData() {
     const { gardenId } = this.props;
     const contracts = await this.context.contractsPromise;
     try {
+      const rows = [];
       const garden = await contracts.GardenContract.methods
         .getGardenById(gardenId)
         .call();
@@ -63,19 +89,31 @@ class DisputeProposals extends Component {
         this.setState({ isEmpty: false });
         for (let id = 0; id < garden.rentLength; id += 1) {
           const rent = await contracts.GardenContract.methods
-            .getRentByGardenAndRentId(id)
+            .getRentByGardenAndRentId(gardenId, id)
             .call();
           const duration = Number(rent.duration);
           const beginning = Number(rent.beginning);
           const rate = Number(rent.rate);
+          const gardenStatus = Number(garden.status);
+
           let status;
-          if (beginning === 0) {
-            status = 'Pas commencé';
-          } else if (beginning + duration < Date.now() / 1000) {
-            status = 'Terminé';
+          if (gardenStatus === 6) {
+            status = 'Litige';
           } else {
-            status = 'En cours';
+            if (beginning === 0) {
+              if (gardenStatus === 1 || id !== Number(garden.rentLength) - 1) {
+                status = 'Annulé';
+              } else {
+                status = 'Pas commencé';
+              }
+            }
+            if (beginning + duration < Date.now() / 1000) {
+              status = 'Terminé';
+            } else {
+              status = 'En cours';
+            }
           }
+
           const row = {
             tenant: rent.tenant,
             duration:
@@ -83,18 +121,36 @@ class DisputeProposals extends Component {
                 ? `${duration / 60 / 60} heures`
                 : `${duration / 60 / 60 / 24} jours`,
             status,
-            price: rent.price,
-            balance: rent.balance,
-            rate: rate !== -1 ? rate : 'non noté',
-            gardenHashCode: rent.gardenHashCode,
+            price: `${Web3Utils.getEtherFromWei(rent.price)} ETH`,
+            balance: `${Web3Utils.getEtherFromWei(rent.balance)} ETH`,
+            rate: rate !== -1 ? rate : 'Non noté',
+            seeMore:
+              this.props.seeMore === true ? (
+                <button
+                  style={{
+                    borderRadius: '8px',
+                    height: 'auto',
+                    fontSize: '11px',
+                  }}
+                  type='submit'
+                  onClick={() => {
+                    this.toggle(garden, gardenId);
+                  }}
+                >
+                  Voir jardin
+                </button>
+              ) : (
+                ''
+              ),
           };
-          this.setState({
-            allRents: {
-              columns: [...this.state.allRents.columns],
-              rows: [...this.state.allRents.rows, row],
-            },
-          });
+          rows.push(row);
         }
+        this.setState({
+          allRents: {
+            columns: [...this.state.allRents.columns],
+            rows,
+          },
+        });
       } else {
         this.setState({ isEmpty: true });
       }
@@ -110,26 +166,41 @@ class DisputeProposals extends Component {
   }
 
   render() {
-    const { isEmpty, allRents } = this.state;
+    const { isEmpty, allRents, modal, gardenInfo, gardenId } = this.state;
     let toDisp;
     if (isEmpty) {
       toDisp = <h6>Il n&apos;y a pas de locations pour ce jardin.</h6>;
     } else {
       toDisp = (
-        <MDBDataTableV5
-          infoLabel={['', '-', 'sur', '']}
-          entriesLabel='Locations par page'
-          hover
-          data={allRents}
-          entries={7}
-          searching={false}
-        />
+        <div>
+          <MDBDataTableV5
+            infoLabel={['', '-', 'sur', '']}
+            entriesLabel='Locations par page'
+            hover
+            data={allRents}
+            entries={7}
+            searching={false}
+          />
+          <MDBModal isOpen={modal} toggle={this.toggle} size='lg'>
+            <MDBModalHeader
+              style={{ backgroundColor: 'rgb(201,248,215)' }}
+              toggle={() => {
+                this.toggle(null);
+              }}
+            >
+              Jardin n°{gardenId}
+            </MDBModalHeader>
+            <MDBModalBody>
+              <GardenCard gardenData={gardenInfo} />
+            </MDBModalBody>
+          </MDBModal>
+        </div>
       );
     }
     return toDisp;
   }
 }
 
-DisputeProposals.contextType = BlockchainContext;
+RentsDatatable.contextType = BlockchainContext;
 
-export default withToastManager(DisputeProposals);
+export default withToastManager(RentsDatatable);

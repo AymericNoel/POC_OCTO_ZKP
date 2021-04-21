@@ -9,7 +9,7 @@ class UpdateContactForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       newContact: '',
     };
   }
@@ -17,8 +17,8 @@ class UpdateContactForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
@@ -31,12 +31,18 @@ class UpdateContactForm extends Component {
   };
 
   updateContact = async () => {
-    const { gardenIndex, contracts, account, newContact } = this.state;
+    const { gardenId, contracts, account, newContact } = this.state;
     try {
       await contracts.GardenContract.methods
-        .updateGardenContact(gardenIndex, newContact)
+        .updateGardenContact(gardenId, newContact)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add('Contact mis à jour avec succès', {
             appearance: 'success',
           });
@@ -55,24 +61,11 @@ class UpdateContactForm extends Component {
     return (
       <form onSubmit={this.submitHandler}>
         <p className='text-center' style={{ fontSize: '13px' }}>
-          Seul le déployeur des smarts contracts peut mettre à jour le contact
-          administrateur.
+          Ce contact sera accessible par tous les visiteurs du site web.
         </p>
         <MDBInput
           className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
-        <MDBInput
-          className='text-center'
-          label='Nouvelle coordonnée'
+          label='Nouveau contact'
           type='text'
           validate
           required

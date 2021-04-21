@@ -11,7 +11,7 @@ class DeleteOfferForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       password: '',
       loading: false,
     };
@@ -20,11 +20,12 @@ class DeleteOfferForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
+    this.setState({ loading: true });
     event.preventDefault();
     await this.deleteOffer();
   };
@@ -34,16 +35,27 @@ class DeleteOfferForm extends Component {
   };
 
   deleteOffer = async () => {
-    const { gardenIndex, contracts, account, password } = this.state;
-    this.setState({ loading: true });
+    const { gardenId, contracts, account, password } = this.state;
     try {
-      const proof = await computeProof(password);
+      const proofObject = await computeProof(password);
       await contracts.GardenContract.methods
-        .updateGardenSecretHash(gardenIndex, proof.a, proof.b, proof.c)
+        .deleteGardenOffer(
+          gardenId,
+          proofObject.proof.a,
+          proofObject.proof.b,
+          proofObject.proof.c,
+        )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.setState({ loading: false });
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add(
-            `L&apos;offre du jardin ${gardenIndex} a été supprimé avec succès`,
+            `L'offre de location a été supprimé avec succès`,
             {
               appearance: 'success',
             },
@@ -51,7 +63,7 @@ class DeleteOfferForm extends Component {
         });
     } catch (error) {
       this.props.toastManager.add(
-        `Impossible de supprimer l&apos;offre du jardin ${gardenIndex}, veuillez réessayer`,
+        `Impossible de supprimer l'offre de location, veuillez réessayer`,
         {
           appearance: 'error',
         },
@@ -69,18 +81,6 @@ class DeleteOfferForm extends Component {
           locataire ne l&apos;a pas accepté. Une preuve de validité de mot de
           passe sera générée. Cette étape peut durer ~ 45 secondes.
         </p>
-        <MDBInput
-          className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
         <MDBInput
           className='text-center'
           label='Mot de passe'

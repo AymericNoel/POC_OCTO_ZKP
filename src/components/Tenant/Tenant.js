@@ -10,6 +10,7 @@ class Tenant extends Component {
     super();
     this.state = {
       account: 'undefined',
+      updated: false,
     };
   }
 
@@ -20,13 +21,19 @@ class Tenant extends Component {
     }
   }
 
+  updateLocations = () => {
+    this.setState((prevState) => ({
+      updated: !prevState.updated,
+    }));
+  };
+
   render() {
-    const { account } = this.state;
+    const { account, updated } = this.state;
     return (
       <MDBContainer className='ml-1'>
         <MDBRow>
           <MDBCol size='3'>
-            <TenantSideNav />
+            <TenantSideNav updateLocations={this.updateLocations} />
           </MDBCol>
           <MDBCol size='9'>
             <SectionContainer
@@ -39,7 +46,7 @@ class Tenant extends Component {
               }
               noBorder
             >
-              <TenantDatatable />
+              <TenantDatatable updated={updated} />
             </SectionContainer>
           </MDBCol>
         </MDBRow>

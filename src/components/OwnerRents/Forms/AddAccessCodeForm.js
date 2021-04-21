@@ -13,7 +13,7 @@ class AddAccessCodeForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       password: '',
       gardenAccessCode: '',
       loading: false,
@@ -23,8 +23,8 @@ class AddAccessCodeForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
@@ -38,7 +38,7 @@ class AddAccessCodeForm extends Component {
 
   addCode = async () => {
     const {
-      gardenIndex,
+      gardenId,
       contracts,
       account,
       password,
@@ -47,13 +47,13 @@ class AddAccessCodeForm extends Component {
     this.setState({ loading: true });
     try {
       const { web3 } = this.context;
-      const proof = await computeProof(password);
+      const proofObject = await computeProof(password);
       const retrievedGarden = await contracts.GardenContract.methods
-        .getGardenById(gardenIndex)
+        .getGardenById(gardenId)
         .call();
 
       const retrievedRent = await contracts.GardenContract.methods
-        .getRentByGardenAndRentId(gardenIndex, retrievedGarden.rentLength - 1)
+        .getRentByGardenAndRentId(gardenId, retrievedGarden.rentLength - 1)
         .call();
 
       const messageToSign = await contracts.GardenContract.methods
@@ -72,22 +72,29 @@ class AddAccessCodeForm extends Component {
 
       await contracts.GardenContract.methods
         .addAccessCodeToGarden(
-          gardenIndex,
-          proof.a,
-          proof.b,
-          proof.c,
+          gardenId,
+          proofObject.proof.a,
+          proofObject.proof.b,
+          proofObject.proof.c,
           hashedCode,
           encryptedCode,
         )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.setState({ loading: false });
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add('Code ajouté avec succès', {
             appearance: 'success',
           });
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible d&apos;ajouter un code d&apos;accès au jardin, veuillez réessayer',
+        `Impossible d'ajouter un code d'accès au jardin, veuillez réessayer`,
         {
           appearance: 'error',
         },
@@ -101,7 +108,6 @@ class AddAccessCodeForm extends Component {
       tenantSignature,
       web3.eth.accounts.hashMessage(signedMessage),
     );
-
     const encrypted = await EthCrypto.encryptWithPublicKey(
       signerPublicKey,
       accessCode,
@@ -118,18 +124,6 @@ class AddAccessCodeForm extends Component {
           Une preuve de validité de mot de passe sera générée. Cette étape peut
           durer ~ 45 secondes.
         </p>
-        <MDBInput
-          className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
         <MDBInput
           className='text-center'
           label='Mot de passe'

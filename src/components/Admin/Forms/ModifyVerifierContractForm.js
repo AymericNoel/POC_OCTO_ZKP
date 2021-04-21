@@ -35,7 +35,12 @@ class ModifyVerifierContractForm extends Component {
       await contracts.AdminContract.methods
         .modifyVerifierContractAddress(verfierAddress)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
           this.props.toastManager.add(`Adresse modifiée avec succès`, {
             appearance: 'success',
           });

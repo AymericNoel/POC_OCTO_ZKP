@@ -24,6 +24,7 @@ class OwnerRentsSideNav extends Component {
 
   render() {
     const { collapseID } = this.state;
+    const { updateRents, gardenId } = this.props;
     return (
       <MDBNav className='flex-column'>
         <div className='text-center mb-2 ml-n2'>
@@ -37,7 +38,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse1' isOpen={collapseID}>
-          <UpdateContactForm />
+          <UpdateContactForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -50,7 +51,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse2' isOpen={collapseID}>
-          <UpdateSecretForm />
+          <UpdateSecretForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -63,7 +64,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse4' isOpen={collapseID}>
-          <AddOfferForm />
+          <AddOfferForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -76,7 +77,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse7' isOpen={collapseID}>
-          <DeleteOfferForm />
+          <DeleteOfferForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -89,7 +90,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse3' isOpen={collapseID}>
-          <AddAccessCodeForm />
+          <AddAccessCodeForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -102,7 +103,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse5' isOpen={collapseID}>
-          <AddDisputeForm />
+          <AddDisputeForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
         <div className='text-center mb-2 ml-n2'>
           <MDBBtn
@@ -115,7 +116,7 @@ class OwnerRentsSideNav extends Component {
           </MDBBtn>
         </div>
         <MDBCollapse id='collapse6' isOpen={collapseID}>
-          <GetBackEthersForm />
+          <GetBackEthersForm gardenId={gardenId} updateRents={updateRents} />
         </MDBCollapse>
       </MDBNav>
     );

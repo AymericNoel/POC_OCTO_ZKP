@@ -12,7 +12,7 @@ class AddOfferForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       password: '',
       tenantAddress: '',
       duration: 0,
@@ -25,8 +25,8 @@ class AddOfferForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
@@ -40,7 +40,7 @@ class AddOfferForm extends Component {
 
   addOffer = async () => {
     const {
-      gardenIndex,
+      gardenId,
       contracts,
       account,
       password,
@@ -49,22 +49,29 @@ class AddOfferForm extends Component {
       price,
       radioButton,
     } = this.state;
-    this.setState({ loading: true });
     try {
+      this.setState({ loading: true });
       const durationInSeconds = radioButton === 1 ? duration * 60 * 60 : duration * 60 * 60 * 24;
-      const proof = await computeProof(password);
+      const proofObject = await computeProof(password);
       await contracts.GardenContract.methods
-        .updateGardenSecretHash(
-          gardenIndex,
+        .proposeGardenOffer(
+          gardenId,
           tenantAddress,
           durationInSeconds,
           Web3Utils.getWeiFromEther(price),
-          proof.a,
-          proof.b,
-          proof.c,
+          proofObject.proof.a,
+          proofObject.proof.b,
+          proofObject.proof.c,
         )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.setState({ loading: false });
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add(
             'Offre ajoutée avec succès. En attente du paiement du locataire',
             {
@@ -99,18 +106,6 @@ class AddOfferForm extends Component {
         </p>
         <MDBInput
           className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
-        <MDBInput
-          className='text-center'
           label='Mot de passe'
           type='password'
           validate
@@ -134,6 +129,7 @@ class AddOfferForm extends Component {
           label='Adresse du locataire'
           type='text'
           validate
+          required
           size='sm'
           name='tenantAddress'
           pattern='^0x[a-fA-F0-9]{40}$'

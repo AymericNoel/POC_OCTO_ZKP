@@ -1,29 +1,33 @@
 import React, { Component } from 'react';
-import { MDBDataTableV5 } from 'mdbreact';
+import {
+  MDBDataTableV5,
+  MDBModalBody,
+  MDBModalHeader,
+  MDBModal,
+} from 'mdbreact';
 import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
+import Web3Utils from '../../utils/Web3Utils';
+import GardenCard from '../GardenCard';
 
 class TenantDatatable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isEmpty: true,
+      modal: false,
+      gardenInfo: {},
+      gardenId: 0,
       allRents: {
         columns: [
-          {
-            label: 'Locataire',
-            field: 'tenant',
-            width: 136,
-          },
           {
             label: 'Durée',
             field: 'duration',
             width: 136,
           },
           {
-            label: 'Status',
+            label: 'Etat',
             field: 'status',
-            width: 136,
           },
           {
             label: 'Prix',
@@ -41,14 +45,9 @@ class TenantDatatable extends Component {
             width: 136,
           },
           {
-            label: 'Code Hashé',
-            field: 'gardenHashCode',
-            width: 136,
-          },
-          {
-            label: 'Status du jardin',
-            field: 'gardenStatus',
-            width: 136,
+            label: ' ',
+            field: 'seeMore',
+            width: 50,
           },
         ],
         rows: [],
@@ -58,6 +57,25 @@ class TenantDatatable extends Component {
 
   /* eslint no-await-in-loop: "off" */
   async componentDidMount() {
+    await this.fetchData();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.updated !== prevProps.updated) {
+      await this.fetchData();
+    }
+  }
+
+  toggle = (gardenInfo, gardenId) => {
+    const { modal } = this.state;
+    this.setState({
+      modal: !modal,
+      gardenInfo,
+      gardenId,
+    });
+  };
+
+  async fetchData() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
     let found = false;
@@ -66,45 +84,80 @@ class TenantDatatable extends Component {
         .GardenCount()
         .call();
       if (Number(gardenCount) !== 0) {
+        const rows = [];
         for (let id = 1; id <= gardenCount; id += 1) {
           const retrievedGarden = await contracts.GardenContract.methods
             .getGardenById(id)
             .call();
-          const lastRent = await contracts.GardenContract.methods.getRentByGardenAndRentId(
-            id,
-            Number(retrievedGarden.rentLength) - 1,
-          );
-          const duration = Number(lastRent.duration);
-          const beginning = Number(lastRent.beginning);
-          const rate = Number(lastRent.rate);
-          let status;
-          if (beginning === 0) {
-            status = 'Pas commencé';
-          } else if (beginning + duration < Date.now() / 1000) {
-            status = 'Terminé';
-          } else {
-            status = 'En cours';
-          }
-          const row = {
-            tenant: lastRent.tenant,
-            duration:
-              duration < 86400
-                ? `${duration / 60 / 60} heures`
-                : `${duration / 60 / 60 / 24} jours`,
-            status,
-            price: lastRent.price,
-            balance: lastRent.balance,
-            rate: rate !== -1 ? rate : 'non noté',
-            gardenHashCode: lastRent.gardenHashCode,
-            gardenStatus: retrievedGarden.status,
-          };
-          if (row.tenant === account && row.status !== 'Terminé') {
-            found = true;
-            this.setState({ allGardens: [...this.state.allGardens, row] });
+          if (Number(retrievedGarden.rentLength) !== 0) {
+            const lastRent = await contracts.GardenContract.methods
+              .getRentByGardenAndRentId(
+                id,
+                Number(retrievedGarden.rentLength) - 1,
+              )
+              .call();
+            const duration = Number(lastRent.duration);
+            const beginning = Number(lastRent.beginning);
+            const rate = Number(lastRent.rate);
+            const gardenStatus = Number(retrievedGarden.status);
+
+            let status;
+            if (gardenStatus === 6) {
+              status = 'Litige';
+            } else {
+              if (beginning === 0) {
+                status = 'Non commencé';
+              }
+              if (beginning + duration < Date.now() / 1000) {
+                status = 'Terminé';
+              } else {
+                status = 'En cours';
+              }
+            }
+
+            if (
+              lastRent.tenant === account
+              && lastRent.status !== 'Terminé'
+              && gardenStatus !== 1
+            ) {
+              found = true;
+              const row = {
+                duration:
+                  duration < 86400
+                    ? `${duration / 60 / 60} heures`
+                    : `${duration / 60 / 60 / 24} jours`,
+                status,
+                price: `${Web3Utils.getEtherFromWei(lastRent.price)} ETH`,
+                balance: `${Web3Utils.getEtherFromWei(lastRent.balance)} ETH`,
+                rate: rate !== -1 ? rate : 'Non noté',
+                seeMore: (
+                  <button
+                    style={{
+                      borderRadius: '8px',
+                      height: 'auto',
+                      fontSize: '11px',
+                    }}
+                    type='submit'
+                    onClick={() => {
+                      this.toggle(retrievedGarden, id);
+                    }}
+                  >
+                    Voir jardin
+                  </button>
+                ),
+              };
+              rows.push(row);
+            }
           }
         }
         if (found) {
-          this.setState({ isEmpty: false });
+          this.setState({
+            isEmpty: false,
+            allRents: {
+              columns: [...this.state.allRents.columns],
+              rows,
+            },
+          });
         }
       }
     } catch (error) {
@@ -119,7 +172,7 @@ class TenantDatatable extends Component {
   }
 
   render() {
-    const { isEmpty, allRents } = this.state;
+    const { isEmpty, allRents, modal, gardenInfo, gardenId } = this.state;
     let toDisp;
     if (isEmpty) {
       toDisp = (
@@ -130,13 +183,28 @@ class TenantDatatable extends Component {
       );
     } else {
       toDisp = (
-        <MDBDataTableV5
-          infoLabel={['', '-', 'sur', '']}
-          entriesLabel='Locations par page'
-          hover
-          data={allRents}
-          searching={false}
-        />
+        <div>
+          <MDBDataTableV5
+            infoLabel={['', '-', 'sur', '']}
+            entriesLabel='Locations par page'
+            hover
+            data={allRents}
+            searching={false}
+          />
+          <MDBModal isOpen={modal} toggle={this.toggle} size='lg'>
+            <MDBModalHeader
+              style={{ backgroundColor: 'rgb(201,248,215)' }}
+              toggle={() => {
+                this.toggle(null);
+              }}
+            >
+              Jardin n°{gardenId}
+            </MDBModalHeader>
+            <MDBModalBody>
+              <GardenCard gardenData={gardenInfo} />
+            </MDBModalBody>
+          </MDBModal>
+        </div>
       );
     }
     return toDisp;

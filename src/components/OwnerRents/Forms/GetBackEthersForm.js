@@ -11,7 +11,7 @@ class GetBackEthersForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       password: '',
       loading: false,
     };
@@ -20,8 +20,8 @@ class GetBackEthersForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
@@ -34,19 +34,26 @@ class GetBackEthersForm extends Component {
   };
 
   getpayment = async () => {
-    const { gardenIndex, contracts, account, password } = this.state;
+    const { gardenId, contracts, account, password } = this.state;
     this.setState({ loading: true });
     try {
-      const proof = await computeProof(password);
+      const proofObject = await computeProof(password);
       await contracts.GardenContract.methods
         .updateLocationStatusAndGetPayment(
-          gardenIndex,
-          proof.a,
-          proof.b,
-          proof.c,
+          gardenId,
+          proofObject.proof.a,
+          proofObject.proof.b,
+          proofObject.proof.c,
         )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.setState({ loading: false });
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add(
             `Transaction confirmée`,
             {
@@ -75,18 +82,6 @@ class GetBackEthersForm extends Component {
           &quot;libre&quot;. Une preuve de validité de mot de passe sera générée. Cette
           étape peut durer ~ 45 secondes.
         </p>
-        <MDBInput
-          className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
         <MDBInput
           className='text-center'
           label='Mot de passe'

@@ -22,18 +22,18 @@ import { HashUtils } from '../utils/HashUtils';
  */
 function Cards({ data, onClick }) {
   const allCards = data.map((garden) => (
-    <MDBAnimation reveal type='zoomIn' key={garden}>
+    <MDBAnimation reveal type='zoomIn' key={garden.id}>
       <MDBCard style={{ width: '22rem' }} className='mb-3 mr-2' cascade>
         <MDBCardHeader color='success-color'>
           Jardin n°{garden.id}
         </MDBCardHeader>
         <MDBCardBody>
           <MDBBadge pill color='info'>
-            Status : {GardenStatus[garden.status]}
+            Etat : {GardenStatus[garden.status]}
           </MDBBadge>
           <MDBRow style={{ marginTop: '1em' }}>
             <MDBCol>
-              <MDBCardText>Superficie :</MDBCardText>
+              <MDBCardText className="text-left">Superficie :</MDBCardText>
             </MDBCol>
             <MDBCol>
               <MDBCardText>{garden.area}</MDBCardText>
@@ -41,7 +41,7 @@ function Cards({ data, onClick }) {
           </MDBRow>
           <MDBRow>
             <MDBCol>
-              <MDBCardText>Quartier :</MDBCardText>
+              <MDBCardText className="text-left">Quartier :</MDBCardText>
             </MDBCol>
             <MDBCol>
               <MDBCardText>{garden.district}</MDBCardText>
@@ -49,7 +49,7 @@ function Cards({ data, onClick }) {
           </MDBRow>
           <MDBRow>
             <MDBCol>
-              <MDBCardText>Contact :</MDBCardText>
+              <MDBCardText className="text-left">Contact :</MDBCardText>
             </MDBCol>
             <MDBCol>
               <MDBCardText>{garden.contact}</MDBCardText>
@@ -58,10 +58,10 @@ function Cards({ data, onClick }) {
           {garden.secretHash !== null ? (
             <MDBRow>
               <MDBCol>
-                <MDBCardText>Hash du mot de passe :</MDBCardText>
+                <MDBCardText className="text-left">Hash du mot de passe :</MDBCardText>
               </MDBCol>
               <MDBCol>
-                <MDBCardText>
+                <MDBCardText small>
                   {HashUtils.concatDecimalsArrayToHex(garden.secretHash)}
                 </MDBCardText>
               </MDBCol>
@@ -71,7 +71,7 @@ function Cards({ data, onClick }) {
           )}
           <MDBRow>
             <MDBCol>
-              <MDBCardText>Nombre de locations :</MDBCardText>
+              <MDBCardText className="text-left">Nombre de locations :</MDBCardText>
             </MDBCol>
             <MDBCol>
               <MDBCardText>{garden.rentLength}</MDBCardText>
@@ -79,7 +79,7 @@ function Cards({ data, onClick }) {
           </MDBRow>
           <MDBRow>
             <MDBCol>
-              <MDBCardText>Type de jardin :</MDBCardText>
+              <MDBCardText className="text-left">Type de jardin :</MDBCardText>
             </MDBCol>
             <MDBCol>
               <MDBCardText>{GardenType[garden.gardenType]}</MDBCardText>
@@ -90,7 +90,7 @@ function Cards({ data, onClick }) {
               type='button'
               className='gardenButton'
               onClick={() => {
-                onClick(garden.id, garden.status);
+                onClick(garden.id);
               }}
             >
               <h6>

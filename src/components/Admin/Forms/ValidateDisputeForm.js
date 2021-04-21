@@ -23,6 +23,9 @@ class ValidateDisputeForm extends Component {
   submitHandler = async (event) => {
     event.preventDefault();
     await this.acceptDispute();
+    this.setState({
+      disputeId: null,
+    });
   };
 
   changeHandler = (event) => {
@@ -35,7 +38,13 @@ class ValidateDisputeForm extends Component {
       await contracts.AdminContract.methods
         .acceptDispute(disputeId)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateDisputes();
           this.props.toastManager.add(`Litige n°${disputeId} validé`, {
             appearance: 'success',
           });

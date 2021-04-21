@@ -12,7 +12,7 @@ class UpdateSecretForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
       oldPassword: '',
       newPassword: '',
       loading: false,
@@ -22,11 +22,12 @@ class UpdateSecretForm extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
   submitHandler = async (event) => {
+    this.setState({ loading: true });
     event.preventDefault();
     await this.updateSecret();
   };
@@ -37,26 +38,32 @@ class UpdateSecretForm extends Component {
 
   updateSecret = async () => {
     const {
-      gardenIndex,
+      gardenId,
       contracts,
       account,
       oldPassword,
       newPassword,
     } = this.state;
-    this.setState({ loading: true });
     try {
-      const proof = await computeProof(oldPassword);
-      const hash = HashUtils.getHashFromString(newPassword);
+      const proofObject = await computeProof(oldPassword);
+      const passwordHash = HashUtils.getHashFromString(newPassword);
       await contracts.GardenContract.methods
         .updateGardenSecretHash(
-          gardenIndex,
-          proof.a,
-          proof.b,
-          proof.c,
-          HashUtils.getArrayOfDecimalsFromhash(hash),
+          gardenId,
+          proofObject.proof.a,
+          proofObject.proof.b,
+          proofObject.proof.c,
+          HashUtils.getArrayOfDecimalsFromhash(passwordHash),
         )
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.setState({ loading: false });
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add(
             'Mot de passe mis à jour avec succès',
             {
@@ -83,18 +90,6 @@ class UpdateSecretForm extends Component {
           Une preuve de validité de mot de passe sera générée. Cette étape peut
           durer ~ 45 secondes.
         </p>
-        <MDBInput
-          className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
         <MDBInput
           className='text-center'
           label='Ancien mot de passe'

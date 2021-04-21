@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBInput, MDBBtn } from 'mdbreact';
+import { MDBBtn } from 'mdbreact';
 import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../../context/BlockchainContext';
 
@@ -9,19 +9,18 @@ class AddDisputeForm extends Component {
     this.state = {
       contracts: undefined,
       account: undefined,
-      gardenIndex: 0,
+      gardenId: 0,
     };
   }
 
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
-
-    this.setState({ contracts, account });
+    const { gardenId } = this.props;
+    this.setState({ contracts, account, gardenId });
   }
 
-  submitHandler = async (event) => {
-    event.preventDefault();
+  submitHandler = async () => {
     await this.openDispute();
   };
 
@@ -30,12 +29,18 @@ class AddDisputeForm extends Component {
   };
 
   openDispute = async () => {
-    const { gardenIndex, contracts, account } = this.state;
+    const { gardenId, contracts, account } = this.state;
     try {
       await contracts.GardenContract.methods
-        .addDispute(gardenIndex)
+        .addDispute(gardenId)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateRents();
           this.props.toastManager.add(
             'Litige ouvert avec succès, contactez les administrateurs',
             {
@@ -55,31 +60,18 @@ class AddDisputeForm extends Component {
 
   render() {
     return (
-      <form onSubmit={this.submitHandler}>
+      <div>
         <p className='text-center' style={{ fontSize: '13px' }}>
-          Le litige arreta la location en cours prématurement et les fonds
+          Le litige arretera la location en cours prématurement et les fonds
           serons redistribués. Prenez contact avec les administrateurs pour
           expliquer votre problème.
         </p>
-        <MDBInput
-          className='text-center'
-          label='Id du jardin'
-          type='number'
-          validate
-          required
-          min='1'
-          step='1'
-          size='sm'
-          name='gardenIndex'
-          onChange={this.changeHandler}
-        />
-
         <div className='text-center mb-2'>
-          <MDBBtn type='submit' size='sm'>
-            Envoyer
+          <MDBBtn type='button' onClick={this.submitHandler} size='sm'>
+            Ouvrir
           </MDBBtn>
         </div>
-      </form>
+      </div>
     );
   }
 }

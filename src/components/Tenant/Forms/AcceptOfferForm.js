@@ -42,9 +42,15 @@ class AcceptOfferForm extends Component {
       await contracts.GardenContract.methods
         .acceptGardenOffer(gardenIndex, signature)
         .send({ from: account, value: Web3Utils.getWeiFromEther(etherAmount) })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateLocations();
           this.props.toastManager.add(
-            'Proposition acceptée. La location débutera lorsque le propriétaire aura rajouter le code d&apos;accès au jardin',
+            `Proposition acceptée. La location débutera lorsque le propriétaire aura rajouté le code d'accès au jardin`,
             {
               appearance: 'success',
             },
@@ -52,7 +58,7 @@ class AcceptOfferForm extends Component {
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible de d&apos;accepter la proposition, veuillez réessayer',
+        `Impossible d'accepter la proposition, veuillez réessayer`,
         {
           appearance: 'error',
         },
@@ -66,7 +72,7 @@ class AcceptOfferForm extends Component {
         <p className='text-center' style={{ fontSize: '13px' }}>
           Le nombre d&apos;éthers à envoyer doit être supérieur ou égal au
           montant fixé au préalable. Une signature sera demandée, elle servira
-          plus tard au propriétaire pour crypté le code d&apos;accès au jardin
+          plus tard au propriétaire pour chiffrer le code d&apos;accès au jardin
           pour qu&apos;il soit uniquement décryptable par le locataire, vous.
         </p>
         <MDBInput

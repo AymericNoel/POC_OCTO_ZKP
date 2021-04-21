@@ -35,7 +35,13 @@ class RefundForm extends Component {
       await contracts.GardenContract.methods
         .addDispute(gardenIndex)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateLocations();
           this.props.toastManager.add(
             'litige ouvert avec succès, veuillez prendre contact avec les administrateurs',
             {
@@ -45,7 +51,7 @@ class RefundForm extends Component {
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible d&apos;ajouter un litige, veuillez réessayer',
+        `Impossible d'ajouter un litige, veuillez réessayer`,
         {
           appearance: 'error',
         },

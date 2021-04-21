@@ -13,6 +13,9 @@ class Owner extends Component {
       isEmpty: true,
       allGardens: [],
       modal: false,
+      gardenRefresh: 0,
+      contracts: undefined,
+      account: undefined,
     };
   }
 
@@ -20,8 +23,38 @@ class Owner extends Component {
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
     const account = (await this.context.accountsPromise)[0];
+    this.setState({ contracts, account });
+    await this.fetchData();
+  }
+
+  /* eslint no-await-in-loop: "off" */
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.gardenRefresh !== prevState.gardenRefresh) {
+      await this.fetchData();
+    }
+  }
+
+  toggle = () => {
+    this.setState((prevState) => ({
+      modal: !prevState.modal,
+    }));
+  };
+
+  newGarden = () => {
+    this.setState((prevState) => ({
+      gardenRefresh: prevState.gardenRefresh + 1,
+    }));
+  };
+
+  seeMore = (gardenId) => {
+    this.props.history.push(`/Owner/${gardenId}`);
+  };
+
+  async fetchData() {
+    const { contracts, account } = this.state;
     let found = false;
     try {
+      const rows = [];
       const gardenCount = await contracts.GardenContract.methods
         .GardenCount()
         .call();
@@ -45,11 +78,11 @@ class Owner extends Component {
           };
           if (row.owner === account) {
             found = true;
-            this.setState({ allGardens: [...this.state.allGardens, row] });
+            rows.push(row);
           }
         }
         if (found) {
-          this.setState({ isEmpty: false });
+          this.setState({ allGardens: rows, isEmpty: false });
         }
       }
     } catch (error) {
@@ -62,17 +95,6 @@ class Owner extends Component {
       );
     }
   }
-
-  toggle = () => {
-    const { modal } = this.state;
-    this.setState({
-      modal: !modal,
-    });
-  };
-
-  seeMore = (id, status) => {
-    this.props.history.push(`/Owner/${id}?status=${status}`);
-  };
 
   render() {
     const { isEmpty, allGardens, modal } = this.state;
@@ -105,7 +127,11 @@ class Owner extends Component {
           <MDBBtn color='success' onClick={this.toggle}>
             Créer un jardin
           </MDBBtn>
-          <CreateGardenForm display={modal} toggle={this.toggle} />
+          <CreateGardenForm
+            display={modal}
+            toggle={this.toggle}
+            refresh={this.newGarden}
+          />
         </MDBRow>
       </MDBContainer>
     );

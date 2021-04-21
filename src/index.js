@@ -10,13 +10,14 @@ import {
 import App from './App';
 
 const MyCustomToastContainer = (props) => (
-  <DefaultToastContainer {...props} style={{ opacity: 0.75, zIndex: 9999 }} />
+  <DefaultToastContainer {...props} style={{ opacity: 0.91, zIndex: 9999 }} />
 );
 
 ReactDOM.render(
   <React.StrictMode>
     <ToastProvider
       autoDismiss
+      autoDismissTimeout={8000}
       placement='bottom-left'
       components={{ ToastContainer: MyCustomToastContainer }}
     >

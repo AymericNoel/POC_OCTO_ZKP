@@ -93,11 +93,12 @@ You can download node from the official [website](https://nodejs.org/en/download
     ```sh
     npm run ganache
     ```
-2. Deploy smart contracts locally on ganache on the first terminal
+2. Put your ethereum addresses as administrators in [migration file](./migrations/2_contracts_migrations.js) in order to validate gardens
+3. Deploy smart contracts locally on ganache on the first terminal
     ```sh
     npm run migrate
     ```
-3. Run website locally
+4. Run website locally
     ```sh
     npm start
     ```

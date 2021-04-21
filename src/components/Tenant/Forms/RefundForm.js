@@ -35,14 +35,20 @@ class RefundForm extends Component {
       await contracts.GardenContract.methods
         .getRefundBeforeLocation(gardenIndex)
         .send({ from: account })
-        .then(() => {
+        .on('transactionHash', (hash) => {
+          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+            appearance: 'info',
+          });
+        })
+        .once('confirmation', () => {
+          this.props.updateLocations();
           this.props.toastManager.add('Transaction effectuée avec succès', {
             appearance: 'success',
           });
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible d&apos;obtenir un remboursement, veuillez réessayer',
+        `Impossible d'obtenir un remboursement, veuillez réessayer`,
         {
           appearance: 'error',
         },

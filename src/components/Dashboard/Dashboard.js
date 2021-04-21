@@ -60,8 +60,8 @@ class Dashboard extends Component {
     }
   }
 
-  seeMore = (id, status) => {
-    this.props.history.push(`/Dashboard/${id}?status=${status}`);
+  seeMore = (id) => {
+    this.props.history.push(`/Dashboard/${id}`);
   };
 
   render() {
