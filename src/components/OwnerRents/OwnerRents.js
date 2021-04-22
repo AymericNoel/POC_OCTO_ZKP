@@ -36,7 +36,7 @@ class OwnerRents extends Component {
       const gardenCount = await contracts.GardenContract.methods
         .GardenCount()
         .call();
-      if (gardenCount < gardenId) {
+      if (Number(gardenCount) < gardenId) {
         this.props.history.push('/');
       } else {
         const retrievedGarden = await contracts.GardenContract.methods

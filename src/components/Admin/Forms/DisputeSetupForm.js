@@ -66,7 +66,6 @@ class DisputeSetupForm extends Component {
           });
         });
     } catch (error) {
-      console.log(error);
       this.props.toastManager.add(
         'Impossible de fixer un montant pour le litige, veuillez réessayer',
         {

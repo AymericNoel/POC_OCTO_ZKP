@@ -7,31 +7,32 @@ import CreateGardenForm from './CreateGardenForm';
 import SectionContainer from '../SectionContainer';
 
 class Owner extends Component {
+  isMount = false;
+
   constructor() {
     super();
     this.state = {
       isEmpty: true,
       allGardens: [],
       modal: false,
-      gardenRefresh: 0,
-      contracts: undefined,
-      account: undefined,
+      gardenRefresh: false,
     };
   }
 
   /* eslint no-await-in-loop: "off" */
   async componentDidMount() {
-    const contracts = await this.context.contractsPromise;
-    const account = (await this.context.accountsPromise)[0];
-    this.setState({ contracts, account });
+    this.isMount = true;
     await this.fetchData();
   }
 
-  /* eslint no-await-in-loop: "off" */
   async componentDidUpdate(prevProps, prevState) {
     if (this.state.gardenRefresh !== prevState.gardenRefresh) {
       await this.fetchData();
     }
+  }
+
+  componentWillUnmount() {
+    this.isMount = false;
   }
 
   toggle = () => {
@@ -40,9 +41,9 @@ class Owner extends Component {
     }));
   };
 
-  newGarden = () => {
+  refresh = () => {
     this.setState((prevState) => ({
-      gardenRefresh: prevState.gardenRefresh + 1,
+      gardenRefresh: !prevState.gardenRefresh,
     }));
   };
 
@@ -51,7 +52,8 @@ class Owner extends Component {
   };
 
   async fetchData() {
-    const { contracts, account } = this.state;
+    const contracts = await this.context.contractsPromise;
+    const account = (await this.context.accountsPromise)[0];
     let found = false;
     try {
       const rows = [];
@@ -130,7 +132,7 @@ class Owner extends Component {
           <CreateGardenForm
             display={modal}
             toggle={this.toggle}
-            refresh={this.newGarden}
+            refresh={this.refresh}
           />
         </MDBRow>
       </MDBContainer>

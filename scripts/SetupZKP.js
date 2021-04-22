@@ -2,7 +2,6 @@ const { initialize } = require('zokrates-js/node');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const computeProof = require('../src/utils/ZkpUtils');
 const { HashUtils } = require('../src/utils/HashUtils');
 
 const zokratesDir = '../src/zokrates';

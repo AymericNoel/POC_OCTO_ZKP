@@ -57,7 +57,7 @@ class AddOfferForm extends Component {
         .proposeGardenOffer(
           gardenId,
           tenantAddress,
-          durationInSeconds,
+          Math.round(durationInSeconds),
           Web3Utils.getWeiFromEther(price),
           proofObject.proof.a,
           proofObject.proof.b,

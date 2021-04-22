@@ -1,0 +1,23 @@
+@startuml interactions
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+
+actor Admin
+entity Website
+control Zokrates
+database Blockchain
+
+Bob ->Website: Send password
+Website -> Zokrates: Send Bob's password locally
+Zokrates-> Zokrates:Compute password hash and returns proof
+Zokrates-> Website: returns Bob's proof
+
+Website-> Bob: Returns Bob's proof
+Bob-> Admin: Send proof via P2P or mail
+
+Admin->Website: Send Bob's proof to validate Bob's garden
+
+Website-> Blockchain: Send Admins'request with proof and validate Bob's garden if proof is valid
+
+@enduml

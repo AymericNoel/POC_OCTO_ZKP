@@ -94,7 +94,6 @@ class AcceptGardenForm extends Component {
           required
           size='sm'
           name='gardenIndex'
-          value={this.state.gardenIndex}
           onChange={this.changeHandler}
         />
 

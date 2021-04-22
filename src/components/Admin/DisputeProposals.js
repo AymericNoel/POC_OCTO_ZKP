@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MDBDataTableV5, MDBBadge } from 'mdbreact';
+import { MDBDataTableV5, MDBBadge, MDBRow } from 'mdbreact';
 import { withToastManager } from 'react-toast-notifications';
 import BlockchainContext from '../../context/BlockchainContext';
 import Web3Utils from '../../utils/Web3Utils';
@@ -90,12 +90,20 @@ class DisputeProposals extends Component {
                 Litige n° {id}
               </MDBBadge>
             ),
-            accepts: disputeProposal.acceptProposal,
-            ownerAmount: Web3Utils.getEtherFromWei(disputeProposal.ownerAmount),
-            tenantAmount: Web3Utils.getEtherFromWei(
+            accepts: disputeProposal.acceptProposal.map((accept) => (
+              <MDBRow className='my-0' style={{ fontSize: '9px' }}>
+                {accept}
+              </MDBRow>
+            )),
+            ownerAmount: `${Web3Utils.getEtherFromWei(
+              disputeProposal.ownerAmount,
+            )} ETH`,
+            tenantAmount: `${Web3Utils.getEtherFromWei(
               disputeProposal.tenantAmount,
-            ),
-            balance: Web3Utils.getEtherFromWei(disputeProposal.balance),
+            )} ETH`,
+            balance: `${Web3Utils.getEtherFromWei(
+              disputeProposal.balance,
+            )} ETH`,
             isReady:
               disputeProposal.isReady.toString() === 'true' ? 'Oui' : 'Non',
             isOpen:

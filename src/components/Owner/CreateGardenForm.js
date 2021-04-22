@@ -18,10 +18,6 @@ class CreateGardenForm extends Component {
       coOwnersAddresses: '',
       password: '',
     };
-    this.onGardenTypeClick = this.onGardenTypeClick.bind(this);
-    this.onMultipleOwnerClick = this.onMultipleOwnerClick.bind(this);
-    this.submitHandler = this.submitHandler.bind(this);
-    this.sendGardenToBlockchain = this.sendGardenToBlockchain.bind(this);
   }
 
   async componentDidMount() {
@@ -229,10 +225,12 @@ class CreateGardenForm extends Component {
               size='sm'
               type='password'
               rows='2'
-              label='Mot de passe'
+              label='Mot de passe (8 caractères maximum)'
               icon='key'
               onChange={this.changeHandler}
               name='password'
+              maxLength='8'
+              validate
               required
             />
             <div className='text-center'>

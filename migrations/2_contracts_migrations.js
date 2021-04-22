@@ -1,7 +1,7 @@
 const VerifierContract = artifacts.require("Verifier");
 const GardenManagerContract = artifacts.require("GardenManager");
 const AdminManagerContract = artifacts.require("AdminManager");
-const AdminsAddresses=["0x27BC8840E98C08338ce944FF0703B7652dC5DCfF","0xA8932F38d2f0e1d8b1903fb4546Df5c2499a0E1C"];
+const AdminsAddresses=["0x9d9fFD857c0B1908C961D2FB7E5a4fc5871FFCE1","0xC8f56f654eB18560718B4012497122CC9A9E898f"];
 const MinApprovals=2;
 const AdminContractP2PContact="admin@gmail.com";
 

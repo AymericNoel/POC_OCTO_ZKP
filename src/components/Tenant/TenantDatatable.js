@@ -104,21 +104,18 @@ class TenantDatatable extends Component {
             let status;
             if (gardenStatus === 6) {
               status = 'Litige';
+            } else if (beginning === 0) {
+              status = 'Non commencé';
+            } else if (beginning + duration < Date.now() / 1000) {
+              status = 'Terminé';
             } else {
-              if (beginning === 0) {
-                status = 'Non commencé';
-              }
-              if (beginning + duration < Date.now() / 1000) {
-                status = 'Terminé';
-              } else {
-                status = 'En cours';
-              }
+              status = 'En cours';
             }
 
             if (
               lastRent.tenant === account
-              && lastRent.status !== 'Terminé'
-              && gardenStatus !== 1
+               && lastRent.status !== 'Terminé'
+               && gardenStatus !== 1
             ) {
               found = true;
               const row = {

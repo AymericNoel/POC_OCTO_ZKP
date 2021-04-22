@@ -11,6 +11,8 @@ import Web3Utils from '../utils/Web3Utils';
 import GardenCard from './GardenCard';
 
 class RentsDatatable extends Component {
+  isMount = false;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -59,6 +61,7 @@ class RentsDatatable extends Component {
 
   /* eslint no-await-in-loop: "off" */
   async componentDidMount() {
+    this.isMount = true;
     await this.fetchData();
   }
 
@@ -66,6 +69,10 @@ class RentsDatatable extends Component {
     if (this.props.updated !== prevProps.updated) {
       await this.fetchData();
     }
+  }
+
+  componentWillUnmount() {
+    this.isMount = false;
   }
 
   toggle = (gardenInfo, gardenId) => {
@@ -97,21 +104,20 @@ class RentsDatatable extends Component {
           const gardenStatus = Number(garden.status);
 
           let status;
-          if (gardenStatus === 6) {
+          if (gardenStatus === 6 && id === Number(garden.rentLength) - 1) {
             status = 'Litige';
-          } else {
-            if (beginning === 0) {
-              if (gardenStatus === 1 || id !== Number(garden.rentLength) - 1) {
-                status = 'Annulé';
-              } else {
-                status = 'Pas commencé';
-              }
-            }
-            if (beginning + duration < Date.now() / 1000) {
-              status = 'Terminé';
+          } else if (beginning === 0) {
+            if (gardenStatus === 1 || id !== Number(garden.rentLength) - 1) {
+              status = 'Annulé';
             } else {
-              status = 'En cours';
+              status = 'Pas commencé';
             }
+          } else if (beginning + duration < Date.now() / 1000) {
+            status = 'Terminé';
+          } else if (id !== Number(garden.rentLength) - 1) {
+            status = 'Annulé par litige';
+          } else {
+            status = 'En cours';
           }
 
           const row = {

@@ -14,7 +14,8 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-        <li><a href="#run">Run</a></li>
+        <li><a href="#run-locally">Run Locally</a></li>
+        <li><a href="#run-rinkeby">Run on Rinkeby</a></li>
         <li><a href="#tests">Tests</a></li>
       </ul>
     </li>
@@ -87,16 +88,31 @@ You can download node from the official [website](https://nodejs.org/en/download
     ```sh
     npm run compile
     ```
-### Run
+### Run locally
 
 1. Open a new terminal and launch *ganache-cli*
     ```sh
     npm run ganache
     ```
 2. Put your ethereum addresses as administrators in [migration file](./migrations/2_contracts_migrations.js) in order to validate gardens
-3. Deploy smart contracts locally on ganache on the first terminal
+3. Deploy the smart contracts locally on ganache on the first terminal
     ```sh
-    npm run migrate
+    npm run migrate:ganache
+    ```
+4. Run website locally
+    ```sh
+    npm start
+    ```
+### Run locally
+
+1. Create *.env* file at the root of the repo with your mnemonic and your infura api key :
+   > MNEMONIC = "" 
+   >
+   > INFURAY_KEY = ""
+2. Put your ethereum addresses as administrators in [migration file](./migrations/2_contracts_migrations.js) in order to validate gardens
+3. Deploy the smart contracts on Rinkeby
+    ```sh
+    npm run migrate:rinkeby
     ```
 4. Run website locally
     ```sh
