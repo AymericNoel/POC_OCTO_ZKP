@@ -1,0 +1,23 @@
+@startuml send garden access code
+title **Send Garden Access Code**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+
+actor Bob
+box "Website" #LightBlue
+entity UI
+control EthCryptoLibrary
+end box
+
+database Blockchain
+
+Bob -> UI: Sends garden access code for a specific garden
+UI-> UI : Hashes garden access code
+UI -> Blockchain: Requests tenant signature for the requested garden
+Blockchain-> UI : Sends back tenant's signature of "sign me"
+UI-> EthCryptoLibrary: Sends garden access Code and tenant signature
+EthCryptoLibrary -> EthCryptoLibrary: Extracts the tenant's public key and encrypts the garden access code
+EthCryptoLibrary -> UI : Sends back encrypted garden access code
+UI -> Blockchain : Sends encrypted garden access code and hashed access code to blockchain
+
+@enduml

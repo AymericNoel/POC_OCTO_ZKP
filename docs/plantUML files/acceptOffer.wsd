@@ -1,0 +1,12 @@
+@startuml acceptOffer
+title **Accept Offer**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Alice
+entity Website
+database Blockchain
+
+Alice -> Website: Sends correct amount of ether and sign "sign me"
+Website -> Blockchain: Offer accepted if ethers sent > required amount then signature is saved
+
+@enduml

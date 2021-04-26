@@ -1,0 +1,25 @@
+@startuml adminValidateGarden
+title **Admin Validate Garden**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+box "Website" #LightBlue
+entity UI
+control ZokratesLibrary
+end box
+actor Admin
+database Blockchain
+
+Bob ->UI: Sends password
+UI -> ZokratesLibrary: Sends Bob's password
+ZokratesLibrary-> ZokratesLibrary:Computes password hash and returns proof
+ZokratesLibrary-> UI: Returns Bob's proof
+
+UI-> Bob: Returns Bob's proof
+Bob-> Admin: Sends proof via P2P or mail
+
+Admin->UI: Sends Bob's proof to validate Bob's garden
+
+UI-> Blockchain: Sends Admins'request with proof and validate Bob's garden if proof is valid
+
+@enduml

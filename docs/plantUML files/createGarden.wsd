@@ -1,0 +1,12 @@
+@startuml createGarden
+title **Create Garden**
+skinparam sequenceMessageAlign center
+actor Bob
+entity Website
+database Blockchain
+
+Bob -> Website: Creates garden 
+Website->Website: Computes hash password and return hash in decimal array [2]
+Website -> Blockchain: Creates garden with hashed password : Bob owner
+
+@enduml
