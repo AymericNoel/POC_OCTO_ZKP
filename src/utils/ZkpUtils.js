@@ -2,10 +2,6 @@ import { initialize } from 'zokrates-js';
 import { HashUtils } from './HashUtils';
 import Abi from '../zokrates/abi.json';
 
-/* eslint-disable import/no-webpack-loader-syntax, import/no-unresolved */
-import ProvingKey from '!!binary-loader!../zokrates/provingKey.bin';
-import Program from '!!binary-loader!../zokrates/program.bin';
-
 /**
  * Compute ZKP proof from hash preimage.
  *
@@ -15,8 +11,11 @@ import Program from '!!binary-loader!../zokrates/program.bin';
 const computeProof = (preimage) => new Promise((resolve) => {
   initialize().then(async (zokratesProvider) => {
     const abi = JSON.stringify(Abi);
-    const program = Buffer.from(Program, 'binary');
-    const provingKey = Buffer.from(ProvingKey, 'binary');
+    const importedProgram = (await import('../zokrates/program.bin')).default;
+    const program = Buffer.from(importedProgram, 'binary');
+
+    const importedKey = (await import('../zokrates/provingKey.bin')).default;
+    const provingKey = Buffer.from(importedKey, 'binary');
 
     const artifacts = { program, abi };
     const decimalPreimage = HashUtils.getDecimalFromString(preimage);
@@ -27,8 +26,6 @@ const computeProof = (preimage) => new Promise((resolve) => {
 
     // Computation
     const computationResult = zokratesProvider.computeWitness(artifacts, [
-      '0',
-      '0',
       '0',
       decimalPreimage.toString(),
       decimalHashArray[0].toString(),

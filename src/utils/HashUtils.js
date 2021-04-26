@@ -23,7 +23,7 @@ function hexStringToByte(str) {
 }
 
 const getHashFromDecimal = (preimage) => {
-  const hexValue = BigInt(preimage).toString(16).padStart(128, '0');
+  const hexValue = BigInt(preimage).toString(16).padStart(64, '0');
   return crypto
     .createHash('sha256')
     .update(hexStringToByte(hexValue))

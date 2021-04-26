@@ -21,8 +21,6 @@ const generateProof = (preimage, zokratesProvider, artifacts, provingKey) =>
     // Computation
     const computationResult = zokratesProvider.computeWitness(artifacts, [
       '0',
-      '0',
-      '0',
       decimalPreimage.toString(),
       decimalHashArray[0].toString(),
       decimalHashArray[1].toString(),
@@ -47,9 +45,9 @@ const generateZokratesSetupAndMockProofForTests = () => {
     '\nGeneration of mock proof for solidity tests and zero knowledge proof new setup ...\n',
   );
   rl.question(
-    'Attention this step can be long, do you want to skip it ? \n(y) Yes  / (n) No\n',
+    'Attention this step can be long, do you want to proccess ? \n(y) Yes  / (n) No\n',
     (answer) => {
-      if (answer.toUpperCase() !== 'y'.toUpperCase()) {
+      if (answer.toUpperCase() === 'y'.toUpperCase()) {
         console.log('Zero Knowledge Proof Setup ...');
 
         initialize().then(async (zokratesProvider) => {
@@ -95,8 +93,8 @@ const generateZokratesSetupAndMockProofForTests = () => {
             keypair.pk,
           );
           proof['decimalHash'] = [
-            '254960964953927206500213748090202348550',
-            '161448835893749292677740045653760556657',
+            '20681647278589003737256370945052365463',
+            '289140766284904553191244936235506921461',
           ];
           let outputFile = JSON.stringify(proof, null, 2);
           fs.writeFileSync(

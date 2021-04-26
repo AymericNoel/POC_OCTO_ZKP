@@ -30,13 +30,16 @@ const getContracts = async (_web3) => {
 };
 
 const metamaskRefresh = () => {
-  window.ethereum.on('accountsChanged', () => {
-    window.location.reload();
-  });
+  try {
+    window.ethereum.on('accountsChanged', () => {
+      window.location.reload();
+    });
 
-  window.ethereum.on('chainChanged', () => {
-    window.location.reload();
-  });
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+    /* eslint no-console: "off" */
+  } catch (error) { console.log('cant connect to window.ethereum.'); }
 };
 
 const getWeb3 = () => {

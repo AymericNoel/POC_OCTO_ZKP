@@ -11,16 +11,6 @@
       "type": "field"
     },
     {
-      "name": "c",
-      "public": false,
-      "type": "field"
-    },
-    {
-      "name": "d",
-      "public": false,
-      "type": "field"
-    },
-    {
       "name": "hash1",
       "public": true,
       "type": "field"

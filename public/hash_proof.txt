@@ -1,7 +1,28 @@
-import "hashes/sha256/512bitPacked" as sha256packed
+import "utils/pack/u32/pack128" as pack128
+import "utils/pack/u32/unpack128" as unpack128
+import "hashes/sha256/256bitPadded" as sha256
 
-def main(private field a, private field b, private field c, private field d, field hash1, field hash2) :
-        field[2] h = sha256packed([a, b, c, d])
+// A function that takes an array of 2 field elements as input, unpacks each of them to 128
+// bits (big endian), concatenates them and applies sha256.
+// It then returns an array of two field elements, each representing 128 bits of the result.
+def customHash(field[2] preimage) -> field[2]:
+
+    u32[4] a_bits = unpack128(preimage[0])
+    u32[4] b_bits = unpack128(preimage[1])
+
+    u32[8] hs = [...a_bits, ...b_bits]
+
+    u32[8] r = sha256(hs)
+
+    return [pack128(r[0..4]), pack128(r[4..8])]
+	
+	
+def main(private field a, private field b, field hash1, field hash2):
+	field[2] h = customHash([a, b])
 	assert(h[0]==hash1)
 	assert(h[1]==hash2)
         return 
+
+
+	
+

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withToastManager } from 'react-toast-notifications';
 import {
   MDBNavbar,
   MDBTooltip,
@@ -54,8 +55,10 @@ function ConnectedButton(props) {
     </MDBTooltip>
   );
 }
+
 const activeStyleNavItem = { backgroundColor: '#689f38 ' };
-export default class App extends Component {
+
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -83,7 +86,16 @@ export default class App extends Component {
   }
 
   handleLoginClick = () => {
-    Web3.givenProvider.enable();
+    try {
+      Web3.givenProvider.enable();
+    } catch (error) {
+      this.props.toastManager.add(
+        'Impossible de connecter Metamask, veuillez vérifier votre extension',
+        {
+          appearance: 'error',
+        },
+      );
+    }
   };
 
   toggleCollapse = () => {
@@ -136,10 +148,14 @@ export default class App extends Component {
                     </MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
-                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Tenant'>Locataire</MDBNavLink>
+                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Tenant'>
+                      Locataire
+                    </MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
-                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Admin'>Admin</MDBNavLink>
+                    <MDBNavLink activeStyle={activeStyleNavItem} to='/Admin'>
+                      Admin
+                    </MDBNavLink>
                   </MDBNavItem>
                   <MDBNavItem className='navBarCustom'>
                     <MDBDropdown>
@@ -169,12 +185,12 @@ export default class App extends Component {
               <p className='footer-copyright mb-0 py-3 text-center'>
                 &copy;
                 {new Date().getFullYear()} Copyright :{' '}
-                <a href='https://www.octo.com/' target='blank'>
-                  octo.com{' '}
-                </a>
-                |{' '}
                 <a href='https://github.com/AymericNoel' target='blank'>
                   Aymeric NOEL
+                </a>
+                {' '}| Stage chez{' '}
+                <a href='https://www.octo.com/' target='blank'>
+                  Octo Technology
                 </a>
               </p>
             </MDBFooter>
@@ -184,3 +200,5 @@ export default class App extends Component {
     );
   }
 }
+
+export default withToastManager(App);

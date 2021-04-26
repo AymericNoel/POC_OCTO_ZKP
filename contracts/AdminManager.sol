@@ -30,7 +30,7 @@ contract AdminManager{
     GardenManager public GManager;  
 
     //administrators of this contract
-    mapping (address=>bool) private ContractAdmins; 
+    mapping (address=>bool) public ContractAdmins; 
 
     mapping (uint=>GardenProposal) public GardenProposals;
     mapping (uint=>DisputeProposal) public DisputeProposals;

@@ -141,7 +141,7 @@ Use this website to make decentralized garden rentals.
 A minimum number of administrators must however be defined when deploying smart contracts in order to verify the existence of the different gardens.
 Any owner can add his garden anonymously and any tenant can rent anonymously too.
 
-**A demo can be found here : https://demoaddress**
+**A demo can be found here : https://zeroknowledgegarden.surge.sh**
 
 ## License
 
