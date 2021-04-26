@@ -40,7 +40,7 @@ This way, even if a dishonest person manages to steal a user's ethereum private 
 
 <br/>
 
-A complete and detailed description of how the application works can be found [here](./docs/plantUML_diagrams/), thanks to rich sequence diagrams.
+A complete and detailed description of how the application works can be found [here](./diagram_sequences.md), thanks to rich sequence diagrams.
 
 <br/>
 
