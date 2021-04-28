@@ -1,7 +1,7 @@
-@startuml proofGeneration
+@startuml GenerationPreuve
 title **Génération de preuve**
 skinparam sequenceMessageAlign center
-skinparam maxMessageSize 130
+skinparam maxMessageSize 180
 actor Bob
 box "Website" #LightBlue
 entity UI
@@ -10,20 +10,20 @@ end box
 database Repository
 actor Developer
 
-== setup ZKP ==
+== Setup ZKP ==
 Developer -> Repository: Lance le script de setup ZKP
 autonumber
-Repository-> Repository : Compile le fichier .zok et sauvegarde 'program.bin' and 'abi.json'
-Repository -> Repository: Génère la paire de clés et sauvegarde 'verification.key' and 'proving.bin'
-Repository -> Repository: Exporte verifier.sol : solidity contract
+Repository-> Repository : Compile le fichier .zok et sauvegarde 'program.bin' et 'abi.json'
+Repository -> Repository: Génère la paire de clés et sauvegarde 'verification.key' et 'proving.bin'
+Repository -> Repository: Exporte verifier.sol : contrat solidity
 Repository-> Repository: Génère une preuve de connaissance de hash de 'input' dans le but d'avoir une preuve dans le répértoire "tests"
 autonumber stop
-== proof Generation ==
+== Génération de preuve ==
 group A chaque fois que l'on veut une preuve ~ 10-30s
 Bob -> UI: Envoie son mot de passe pour lequel il veut une preuve
-UI-> Repository: Demande 3 fichiers : 'program.bin', 'proving.bin' and 'abi.json'
+UI-> Repository: Demande 3 fichiers : 'program.bin', 'proving.bin' et 'abi.json'
 Repository-> ZokratesLibrary: Renvoie les fichiers demandés
-ZokratesLibrary -> ZokratesLibrary: Génère une preuve avec le mot de passe de Bob et 'program.bin', 'proving.bin' and 'abi.json
+ZokratesLibrary -> ZokratesLibrary: Génère une preuve avec le mot de passe de Bob et 'program.bin', 'proving.bin' et 'abi.json
 ZokratesLibrary -> UI : Renvoie la preuve
 UI -> Bob: Recoit la preuve et peut la faire vérifier par 'verifier.sol'
 end

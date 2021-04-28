@@ -1,7 +1,7 @@
 @startuml proofGeneration
 title **Proof generation**
 skinparam sequenceMessageAlign center
-skinparam maxMessageSize 130
+skinparam maxMessageSize 180
 actor Bob
 box "Website" #LightBlue
 entity UI
@@ -10,7 +10,7 @@ end box
 database Repository
 actor Developer
 
-== setup ZKP ==
+== Setup ZKP ==
 Developer -> Repository: runs ZKP setup script
 autonumber
 Repository-> Repository : Compiles Zok file and saves 'program.bin' and 'abi.json'
@@ -23,7 +23,7 @@ group Every time we want a proof ~ 10-30s
 Bob -> UI: Sends his password for which he wants a proof
 UI-> Repository: Requests three files : 'program.bin', 'proving.bin' and 'abi.json'
 Repository-> ZokratesLibrary: Sends back the requested files
-ZokratesLibrary -> ZokratesLibrary: Generates proof with Bob's password, 'program.bin', 'proving.bin' and 'abi.json
+ZokratesLibrary -> ZokratesLibrary: Generates proof with Bob's password and 'program.bin', 'proving.bin', 'abi.json
 ZokratesLibrary -> UI : Sends back proof
 UI -> Bob: Receives his proof and can have it verified by 'verifier.sol'
 end
