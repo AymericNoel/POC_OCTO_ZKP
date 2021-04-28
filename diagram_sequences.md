@@ -1,26 +1,30 @@
 <div align="center">
 
-![HomePage](./docs/plantUML_diagrams/createGarden.png)
+![proofGeneration](./docs/plantUML_diagrams/en/proofGeneration.png)
 
 -----
 
-![HomePage](./docs/plantUML_diagrams/adminValidateGarden.png)
+![createGarden](./docs/plantUML_diagrams/en/createGarden.png)
 
 -----
 
-![HomePage](./docs/plantUML_diagrams/proposeOffer.png)
+![adminValidateGarden](./docs/plantUML_diagrams/en/adminValidateGarden.png)
 
 -----
 
-![HomePage](./docs/plantUML_diagrams/acceptOffer.png)
+![proposeOffer](./docs/plantUML_diagrams/en/proposeOffer.png)
 
 -----
 
-![HomePage](<./docs/plantUML_diagrams/send garden access code.png>)
+![acceptOffer](./docs/plantUML_diagrams/en/acceptOffer.png)
 
 -----
 
-![HomePage](./docs/plantUML_diagrams/getBackGardenAccessCode.png)
+![SendGardenAccessCode](<./docs/plantUML_diagrams/en/send garden access code.png>)
+
+-----
+
+![getBackGardenAccessCode](./docs/plantUML_diagrams/en/getBackGardenAccessCode.png)
 
 </div>
 

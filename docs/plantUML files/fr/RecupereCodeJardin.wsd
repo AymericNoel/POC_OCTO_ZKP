@@ -1,0 +1,21 @@
+@startuml RecupereCodeJardin
+title *Récupérer le code d'accès au jardin**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Alice
+box "Website" #LightBlue
+entity UI
+control EthCryptoLibrary
+end box
+database Blockchain
+
+Alice -> UI: Demande le code d'accès chiffré du jardin pour sa location
+UI -> Blockchain: Demande du code d'accès chiffré du jardin
+Blockchain -> UI: Renvoie un code d'accès chiffré du jardin si Alice est la bonne locataire
+UI -> Alice: Renvoie le code d'accès
+
+Alice -> EthCryptoLibrary: Envoie le code d'accès chiffré et sa private key
+EthCryptoLibrary -> EthCryptoLibrary: Déchiffrage du code d'accès au jardin
+EthCryptoLibrary -> Alice: Renvoie le code d'accès déchiffré
+
+@enduml

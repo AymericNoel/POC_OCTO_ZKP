@@ -1,0 +1,31 @@
+@startuml proofGeneration
+title **Génération de preuve**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+box "Website" #LightBlue
+entity UI
+control ZokratesLibrary
+end box
+database Repository
+actor Developer
+
+== setup ZKP ==
+Developer -> Repository: Lance le script de setup ZKP
+autonumber
+Repository-> Repository : Compile le fichier .zok et sauvegarde 'program.bin' and 'abi.json'
+Repository -> Repository: Génère la paire de clés et sauvegarde 'verification.key' and 'proving.bin'
+Repository -> Repository: Exporte verifier.sol : solidity contract
+Repository-> Repository: Génère une preuve de connaissance de hash de 'input' dans le but d'avoir une preuve dans le répértoire "tests"
+autonumber stop
+== proof Generation ==
+group A chaque fois que l'on veut une preuve ~ 10-30s
+Bob -> UI: Envoie son mot de passe pour lequel il veut une preuve
+UI-> Repository: Demande 3 fichiers : 'program.bin', 'proving.bin' and 'abi.json'
+Repository-> ZokratesLibrary: Renvoie les fichiers demandés
+ZokratesLibrary -> ZokratesLibrary: Génère une preuve avec le mot de passe de Bob et 'program.bin', 'proving.bin' and 'abi.json
+ZokratesLibrary -> UI : Renvoie la preuve
+UI -> Bob: Recoit la preuve et peut la faire vérifier par 'verifier.sol'
+end
+
+@enduml

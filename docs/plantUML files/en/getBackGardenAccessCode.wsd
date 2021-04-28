@@ -1,5 +1,5 @@
 @startuml getBackGardenAccessCode
-title **Gat Back Garden Access Code**
+title **Get Back Garden Access Code**
 skinparam sequenceMessageAlign center
 skinparam maxMessageSize 130
 actor Alice
@@ -14,7 +14,7 @@ UI -> Blockchain: Requests encrypted garden access code
 Blockchain -> UI: Sends back encrypted garden access code if Alice is the correct tenant
 UI -> Alice: Sends back garden code
 
-Alice -> EthCryptoLibrary: Sends encrypted code with her Ethereum private key
+Alice -> EthCryptoLibrary: Sends encrypted code and her Ethereum private key
 EthCryptoLibrary -> EthCryptoLibrary: Decrypts garden access code
 EthCryptoLibrary -> Alice: Sends back plain garden access code
 

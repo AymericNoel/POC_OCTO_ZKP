@@ -1,0 +1,23 @@
+@startuml ValidationJardinParAdmins
+title **Validation du jardin**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+box "Website" #LightBlue
+entity UI
+control ZokratesLibrary
+end box
+actor Admin
+database Blockchain
+
+Bob ->UI: Envoie son mot de passe
+UI -> ZokratesLibrary: Envoie le mot de passe de Bob
+ZokratesLibrary-> ZokratesLibrary: Calcule le hash du mot de passe et retourne la preuve
+ZokratesLibrary-> UI: Retourne la preuve de Bob
+
+UI-> Bob: Retourne la preuve de Bob
+Bob-> Admin: Envoi de la preuve par P2P ou par mail
+Admin->UI: Envoie la preuve de Bob pour valider son jardin
+UI-> Blockchain: Envoie la demande de l'administrateur avec la preuve et valide le jardin de Bob si la preuve est valides
+
+@enduml

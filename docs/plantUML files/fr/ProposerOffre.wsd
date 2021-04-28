@@ -1,0 +1,21 @@
+@startuml proposerOffre
+title **Proposition d'offre**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+box "Website" #LightBlue
+entity UI
+control ZokratesLibrary
+end box
+database Blockchain
+
+Bob -> UI: Envoie son mot de passe pour prouver qu'il ait bien le propriétaire du jardin
+note left: Bob veut ajouter une proposition
+
+UI -> ZokratesLibrary: Envoie le mot de passe de Bob localement via le navigateur
+ZokratesLibrary->ZokratesLibrary: Calcul le hash du mot de passe et crée une preuve de connaissance de la préimage
+ZokratesLibrary->UI: Envoie la preuve de Bob localement
+UI -> Blockchain: Envoie la preuve de Bob avec l'offre
+Blockchain->Blockchain: Vérifier la preuve et créer une offre en cas de succès
+
+@enduml

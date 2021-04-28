@@ -1,0 +1,12 @@
+@startuml accepterOffre.wsd
+title **Accepter offre de location**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Alice
+entity Website
+database Blockchain
+
+Alice -> Website: Envoie le nombre requis d'ethers convenus et signe 'sign me'
+Website -> Blockchain:  Offre acceptée si le nombre d'ethers envoyés > nombre d'ethers requis => signature sauvegardé
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml proofGeneration
+title **Proof generation**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+actor Bob
+box "Website" #LightBlue
+entity UI
+control ZokratesLibrary
+end box
+database Repository
+actor Developer
+
+== setup ZKP ==
+Developer -> Repository: runs ZKP setup script
+autonumber
+Repository-> Repository : Compiles Zok file and saves 'program.bin' and 'abi.json'
+Repository -> Repository: Generates keyPair and saves 'verification.key' and 'proving.bin'
+Repository -> Repository: Exports verifier.sol : solidity contract
+Repository-> Repository: Generates proof of knowledge with 'input' as input in order to have  mock proof in test dir
+autonumber stop
+== proof Generation ==
+group Every time we want a proof ~ 10-30s
+Bob -> UI: Sends his password for which he wants a proof
+UI-> Repository: Requests three files : 'program.bin', 'proving.bin' and 'abi.json'
+Repository-> ZokratesLibrary: Sends back the requested files
+ZokratesLibrary -> ZokratesLibrary: Generates proof with Bob's password, 'program.bin', 'proving.bin' and 'abi.json
+ZokratesLibrary -> UI : Sends back proof
+UI -> Bob: Receives his proof and can have it verified by 'verifier.sol'
+end
+
+@enduml

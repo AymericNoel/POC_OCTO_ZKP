@@ -16,6 +16,6 @@ UI -> ZokratesLibrary: Sends Bob's password locally in browser
 ZokratesLibrary->ZokratesLibrary: Computes password's hash and creates proof of knowledge of preimage
 ZokratesLibrary->UI: Sends Bob's proof locally
 UI -> Blockchain: Sends Bob's proof within the offer
-Blockchain->Blockchain: Verifies proof and create offer if succeed
+Blockchain->Blockchain: Verifies proof and creates offer if succeed
 
 @enduml

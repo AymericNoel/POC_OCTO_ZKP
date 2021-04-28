@@ -1,0 +1,12 @@
+@startuml creerJardin
+title **Créer un jardin**
+skinparam sequenceMessageAlign center
+actor Bob
+entity Website
+database Blockchain
+
+Bob -> Website: Crée un jardin
+Website->Website: Calcule le hash du mot de passe et le retourne sous forme decimal[2]
+Website -> Blockchain: Créer jardin avec le mot de passe hashé : Bob est proprietaire
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml envoyerCodeJardin
+title **Envoyer code d'accès au jardin**
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+
+actor Bob
+box "Website" #LightBlue
+entity UI
+control EthCryptoLibrary
+end box
+
+database Blockchain
+
+Bob -> UI: Envoie le code d'accès au jardin pour un jardin spécifique
+UI-> UI : Hash le code d'accès au jardin
+UI -> Blockchain: Demande la signature du locataire pour le jardin souhaité
+Blockchain-> UI : Renvoie la signature du locataire de "sign me"
+UI-> EthCryptoLibrary: Envoi du code d'accès au jardin et de la signature du locataire
+EthCryptoLibrary -> EthCryptoLibrary: Extrait la clé publique du locataire et chiffre le code d'accès au jardin
+EthCryptoLibrary -> UI : Renvoie le code d'accès chiffré
+UI -> Blockchain : Envoie le code d'accès chiffré et le hash de ce meme code
+
+@enduml
