@@ -1,4 +1,4 @@
-@startuml accepterOffre.wsd
+@startuml accepterOffre
 title **Accepter offre de location**
 skinparam sequenceMessageAlign center
 skinparam maxMessageSize 130

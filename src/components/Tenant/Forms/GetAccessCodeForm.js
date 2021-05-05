@@ -41,7 +41,7 @@ class GetAccessCodeForm extends Component {
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible de récupérer le code d&apos;accès au jardin, veuillez réessayer',
+        `Impossible de récupérer le code d'accès du jardin, veuillez réessayer`,
         {
           appearance: 'error',
         },
@@ -76,11 +76,12 @@ class GetAccessCodeForm extends Component {
   );
 
   render() {
+    const { gardenIndex } = this.state;
     return (
       <form onSubmit={this.submitHandler}>
         <p className='text-center' style={{ fontSize: '13px' }}>
           Le code d&apos;accès renvoyé sera celui de la location actuelle dans
-          le jardin &apos;x&apos;.
+          le jardin &apos;{gardenIndex === 0 ? 'x' : gardenIndex}&apos;.
         </p>
         <MDBInput
           className='text-center'

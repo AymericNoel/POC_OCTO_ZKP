@@ -30,12 +30,12 @@ class Tenant extends Component {
   render() {
     const { account, updated } = this.state;
     return (
-      <MDBContainer className='ml-1'>
+      <MDBContainer>
         <MDBRow>
           <MDBCol size='3'>
             <TenantSideNav updateLocations={this.updateLocations} />
           </MDBCol>
-          <MDBCol size='9'>
+          <MDBCol>
             <SectionContainer
               customTitle={
                 (

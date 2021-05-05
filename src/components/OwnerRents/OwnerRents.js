@@ -73,7 +73,7 @@ class OwnerRents extends Component {
       params: { gardenId },
     } = this.props.match;
     return (
-      <MDBContainer className='ml-1'>
+      <MDBContainer>
         <MDBRow>
           <MDBCol size='3'>
             <OwnerRentsSideNav gardenId={gardenId} updateRents={this.updateRents} />

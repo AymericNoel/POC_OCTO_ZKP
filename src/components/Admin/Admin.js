@@ -47,7 +47,7 @@ class Admin extends Component {
   render() {
     const { gardenId, modal, gardenUpdated, disputeUpdated } = this.state;
     return (
-      <MDBContainer className='ml-1'>
+      <MDBContainer>
         <MDBRow>
           <MDBCol size='3'>
             <SideBarNav
@@ -55,7 +55,7 @@ class Admin extends Component {
               updateDisputes={this.updateDisputeProposals}
             />
           </MDBCol>
-          <MDBCol size='9'>
+          <MDBCol>
             <SectionContainer
               title='Propositions jardins/litiges'
               header='Propositions de jardin'

@@ -45,6 +45,11 @@ class TenantDatatable extends Component {
             width: 136,
           },
           {
+            label: `Hash du code d'accès au jardin`,
+            field: 'hash',
+            width: 136,
+          },
+          {
             label: ' ',
             field: 'seeMore',
             width: 50,
@@ -90,60 +95,63 @@ class TenantDatatable extends Component {
             .getGardenById(id)
             .call();
           if (Number(retrievedGarden.rentLength) !== 0) {
-            const lastRent = await contracts.GardenContract.methods
-              .getRentByGardenAndRentId(
-                id,
-                Number(retrievedGarden.rentLength) - 1,
-              )
-              .call();
-            const duration = Number(lastRent.duration);
-            const beginning = Number(lastRent.beginning);
-            const rate = Number(lastRent.rate);
-            const gardenStatus = Number(retrievedGarden.status);
-
-            let status;
-            if (gardenStatus === 6) {
-              status = 'Litige';
-            } else if (beginning === 0) {
-              status = 'Non commencé';
-            } else if (beginning + duration < Date.now() / 1000) {
-              status = 'Terminé';
-            } else {
-              status = 'En cours';
-            }
-
-            if (
-              lastRent.tenant === account
-               && lastRent.status !== 'Terminé'
-               && gardenStatus !== 1
+            for (
+              let rentId = 0;
+              rentId < Number(retrievedGarden.rentLength);
+              rentId += 1
             ) {
-              found = true;
-              const row = {
-                duration:
-                  duration < 86400
-                    ? `${duration / 60 / 60} heures`
-                    : `${duration / 60 / 60 / 24} jours`,
-                status,
-                price: `${Web3Utils.getEtherFromWei(lastRent.price)} ETH`,
-                balance: `${Web3Utils.getEtherFromWei(lastRent.balance)} ETH`,
-                rate: rate !== -1 ? rate : 'Non noté',
-                seeMore: (
-                  <button
-                    style={{
-                      borderRadius: '8px',
-                      height: 'auto',
-                      fontSize: '11px',
-                    }}
-                    type='submit'
-                    onClick={() => {
-                      this.toggle(retrievedGarden, id);
-                    }}
-                  >
-                    Voir jardin
-                  </button>
-                ),
-              };
-              rows.push(row);
+              const lastRent = await contracts.GardenContract.methods
+                .getRentByGardenAndRentId(id, rentId)
+                .call();
+              const duration = Number(lastRent.duration);
+              const beginning = Number(lastRent.beginning);
+              const rate = Number(lastRent.rate);
+              const gardenStatus = Number(retrievedGarden.status);
+
+              let status;
+              if (gardenStatus === 6) {
+                status = 'Litige';
+              } else if (beginning === 0) {
+                status = 'Non commencé';
+              } else if (beginning + duration < Date.now() / 1000) {
+                status = 'Terminé';
+              } else {
+                status = 'En cours';
+              }
+              const gardenHashedCode = parseInt(lastRent.gardenHashCode, 16) === 0
+                ? 'Code Indisponible'
+                : lastRent.gardenHashCode;
+
+              if (lastRent.tenant === account) {
+                found = true;
+                const row = {
+                  duration:
+                    duration < 86400
+                      ? `${duration / 60 / 60} heures`
+                      : `${duration / 60 / 60 / 24} jours`,
+                  status,
+                  price: `${Web3Utils.getEtherFromWei(lastRent.price)} ETH`,
+                  balance: `${Web3Utils.getEtherFromWei(lastRent.balance)} ETH`,
+                  hash: <p style={{ fontSize: '9px' }}>{gardenHashedCode}</p>,
+                  rate: rate !== -1 ? rate : 'Non noté',
+                  seeMore: (
+                    <button
+                      style={{
+                        borderRadius: '8px',
+                        height: 'auto',
+                        fontSize: '11px',
+                      }}
+                      type='submit'
+                      onClick={() => {
+                        this.toggle(retrievedGarden, id);
+                      }}
+                    >
+                      Voir jardin
+                    </button>
+                  ),
+                };
+                rows.push(row);
+              }
             }
           }
         }
@@ -187,6 +195,7 @@ class TenantDatatable extends Component {
             hover
             data={allRents}
             searching={false}
+            order={['status', 'desc']}
           />
           <MDBModal isOpen={modal} toggle={this.toggle} size='lg'>
             <MDBModalHeader

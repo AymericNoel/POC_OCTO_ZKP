@@ -23,7 +23,9 @@ function hexStringToByte(str) {
 }
 
 const getHashFromDecimal = (preimage) => {
-  const hexValue = BigInt(preimage).toString(16).padStart(64, '0');
+  const hexValue = BigInt(preimage)
+    .toString(16)
+    .padStart(64, '0');
   return crypto
     .createHash('sha256')
     .update(hexStringToByte(hexValue))
@@ -50,10 +52,20 @@ const concatDecimalsArrayToHex = (array) => {
   return aHex + bHex;
 };
 
+const hashWithoutInputPadding = (input) => {
+  let hash = crypto
+    .createHash('sha256')
+    .update(input)
+    .digest('hex');
+  hash = '0x' + hash;
+  return hash;
+};
+
 module.exports.HashUtils = {
   concatDecimalsArrayToHex,
   getArrayOfDecimalsFromhash,
   getHashFromString,
   getDecimalFromString,
   getHashFromDecimal,
+  hashWithoutInputPadding,
 };

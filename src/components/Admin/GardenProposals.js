@@ -17,12 +17,10 @@ class GardenProposals extends Component {
           {
             label: 'Accepté par',
             field: 'accepts',
-            width: 136,
           },
           {
             label: 'Rejeté par',
             field: 'rejects',
-            width: 136,
           },
           {
             label: 'Ouverture',

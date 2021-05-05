@@ -62,7 +62,7 @@ class AddAccessCodeForm extends Component {
 
       const tenantSignature = retrievedRent.signature;
 
-      const hashedCode = `0x${HashUtils.getHashFromString(gardenAccessCode)}`;
+      const hashedCode = HashUtils.hashWithoutInputPadding(gardenAccessCode);
       const encryptedCode = await this.encryptCode(
         gardenAccessCode,
         tenantSignature,
@@ -136,11 +136,14 @@ class AddAccessCodeForm extends Component {
         />
         <MDBInput
           className='text-center'
-          label="Code d'accès au jardin"
-          type='password'
+          label="Code d'accès au jardin de 4 chiffres"
+          type='number'
           validate
           required
           size='sm'
+          min='1000'
+          max='9999'
+          step='1'
           name='gardenAccessCode'
           onChange={this.changeHandler}
         />

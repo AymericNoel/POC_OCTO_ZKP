@@ -33,7 +33,6 @@ class RentsDatatable extends Component {
           {
             label: 'Etat',
             field: 'status',
-            width: 300,
           },
           {
             label: 'Prix',
@@ -186,6 +185,7 @@ class RentsDatatable extends Component {
             data={allRents}
             entries={7}
             searching={false}
+            order={['status', 'desc']}
           />
           <MDBModal isOpen={modal} toggle={this.toggle} size='lg'>
             <MDBModalHeader

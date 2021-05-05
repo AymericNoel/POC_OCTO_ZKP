@@ -21,7 +21,7 @@ class Hash extends Component {
       <MDBContainer>
         <SectionContainer
           title='Modules de hachage'
-          header='Génération de hash'
+          header='Génération de hash de mot passe'
         >
           <MDBInput
             label='Mot de passe'
