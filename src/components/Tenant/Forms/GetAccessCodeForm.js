@@ -80,8 +80,17 @@ class GetAccessCodeForm extends Component {
     return (
       <form onSubmit={this.submitHandler}>
         <p className='text-center' style={{ fontSize: '13px' }}>
-          Le code d&apos;accès renvoyé sera celui de la location actuelle dans
-          le jardin &apos;{gardenIndex === 0 ? 'x' : gardenIndex}&apos;.
+          Le code d&apos;accès renvoyé sera celui de votre location dans le
+          jardin &apos;{gardenIndex === 0 ? 'x' : gardenIndex}&apos;. Pour
+          déchiffrer le code reçu avec votre private key, téléchargez ce{' '}
+          <a
+            href='https://github.com/AymericNoel/Garden-Code-Decryptor/releases'
+            target='blank'
+            className='text-decoration-none'
+          >
+            logiciel
+          </a>
+          , qui assure à la fois sécurité et simplicité d&apos;utilisation.
         </p>
         <MDBInput
           className='text-center'
