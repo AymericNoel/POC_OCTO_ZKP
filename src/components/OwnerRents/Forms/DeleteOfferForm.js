@@ -37,30 +37,32 @@ class DeleteOfferForm extends Component {
   deleteOffer = async () => {
     const { gardenId, contracts, account, password } = this.state;
     try {
-      const proofObject = await computeProof(password);
-      await contracts.GardenContract.methods
-        .deleteGardenOffer(
-          gardenId,
-          proofObject.proof.a,
-          proofObject.proof.b,
-          proofObject.proof.c,
-        )
-        .send({ from: account })
-        .on('transactionHash', (hash) => {
-          this.setState({ loading: false });
-          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
-            appearance: 'info',
+      setTimeout(async () => {
+        const proofObject = await computeProof(password);
+        await contracts.GardenContract.methods
+          .deleteGardenOffer(
+            gardenId,
+            proofObject.proof.a,
+            proofObject.proof.b,
+            proofObject.proof.c,
+          )
+          .send({ from: account })
+          .on('transactionHash', (hash) => {
+            this.setState({ loading: false });
+            this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+              appearance: 'info',
+            });
+          })
+          .once('confirmation', () => {
+            this.props.updateRents();
+            this.props.toastManager.add(
+              `L'offre de location a été supprimé avec succès`,
+              {
+                appearance: 'success',
+              },
+            );
           });
-        })
-        .once('confirmation', () => {
-          this.props.updateRents();
-          this.props.toastManager.add(
-            `L'offre de location a été supprimé avec succès`,
-            {
-              appearance: 'success',
-            },
-          );
-        });
+      }, 10);
     } catch (error) {
       this.props.toastManager.add(
         `Impossible de supprimer l'offre de location, veuillez réessayer`,

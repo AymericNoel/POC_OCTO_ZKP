@@ -46,52 +46,54 @@ class AddAccessCodeForm extends Component {
     } = this.state;
     this.setState({ loading: true });
     try {
-      const { web3 } = this.context;
-      const proofObject = await computeProof(password);
-      const retrievedGarden = await contracts.GardenContract.methods
-        .getGardenById(gardenId)
-        .call();
+      setTimeout(async () => {
+        const { web3 } = this.context;
+        const proofObject = await computeProof(password);
+        const retrievedGarden = await contracts.GardenContract.methods
+          .getGardenById(gardenId)
+          .call();
 
-      const retrievedRent = await contracts.GardenContract.methods
-        .getRentByGardenAndRentId(gardenId, retrievedGarden.rentLength - 1)
-        .call();
+        const retrievedRent = await contracts.GardenContract.methods
+          .getRentByGardenAndRentId(gardenId, retrievedGarden.rentLength - 1)
+          .call();
 
-      const messageToSign = await contracts.GardenContract.methods
-        .signMe()
-        .call();
+        const messageToSign = await contracts.GardenContract.methods
+          .signMe()
+          .call();
 
-      const tenantSignature = retrievedRent.signature;
+        const tenantSignature = retrievedRent.signature;
 
-      const hashedCode = HashUtils.hashWithoutInputPadding(gardenAccessCode);
-      const encryptedCode = await this.encryptCode(
-        gardenAccessCode,
-        tenantSignature,
-        messageToSign,
-        web3,
-      );
+        const hashedCode = HashUtils.hashWithoutInputPadding(gardenAccessCode);
+        const encryptedCode = await this.encryptCode(
+          gardenAccessCode,
+          tenantSignature,
+          messageToSign,
+          web3,
+        );
 
-      await contracts.GardenContract.methods
-        .addAccessCodeToGarden(
-          gardenId,
-          proofObject.proof.a,
-          proofObject.proof.b,
-          proofObject.proof.c,
-          hashedCode,
-          encryptedCode,
-        )
-        .send({ from: account })
-        .on('transactionHash', (hash) => {
-          this.setState({ loading: false });
-          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
-            appearance: 'info',
+        await contracts.GardenContract.methods
+          .addAccessCodeToGarden(
+            gardenId,
+            proofObject.proof.a,
+            proofObject.proof.b,
+            proofObject.proof.c,
+            hashedCode,
+            encryptedCode,
+          )
+          .send({ from: account })
+          .on('transactionHash', (hash) => {
+            this.setState({ loading: false });
+            this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+              appearance: 'info',
+            });
+          })
+          .once('confirmation', () => {
+            this.props.updateRents();
+            this.props.toastManager.add('Code ajouté avec succès', {
+              appearance: 'success',
+            });
           });
-        })
-        .once('confirmation', () => {
-          this.props.updateRents();
-          this.props.toastManager.add('Code ajouté avec succès', {
-            appearance: 'success',
-          });
-        });
+      }, 10);
     } catch (error) {
       this.props.toastManager.add(
         `Impossible d'ajouter un code d'accès au jardin, veuillez réessayer`,

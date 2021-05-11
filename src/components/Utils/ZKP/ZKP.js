@@ -20,12 +20,14 @@ class ZKP extends Component {
     event.preventDefault();
     this.setState({ loading: true });
     try {
-      const proof = await computeProof(this.state.preimage);
-      this.setState({ loading: false, proof });
-      document.getElementById('downloadProof').click();
+      setTimeout(async () => {
+        const proof = await computeProof(this.state.preimage);
+        this.setState({ loading: false, proof });
+        document.getElementById('downloadProof').click();
+      }, 10);
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible d&aposexporter la preuve, veuillez réessayer',
+        `Impossible d'exporter la preuve, veuillez réessayer`,
         {
           appearance: 'error',
         },
@@ -62,7 +64,7 @@ class ZKP extends Component {
             </MDBBtn>
             <span>
               <MDBIcon far icon='clock' className='mx-2' />
-              Temps estimé : 30s-1mn
+              {`Temps estimé < 40s`}
             </span>
             {loading ? <Spinner /> : <div />}
           </form>

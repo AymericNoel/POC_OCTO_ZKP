@@ -37,30 +37,32 @@ class GetBackEthersForm extends Component {
     const { gardenId, contracts, account, password } = this.state;
     this.setState({ loading: true });
     try {
-      const proofObject = await computeProof(password);
-      await contracts.GardenContract.methods
-        .updateLocationStatusAndGetPayment(
-          gardenId,
-          proofObject.proof.a,
-          proofObject.proof.b,
-          proofObject.proof.c,
-        )
-        .send({ from: account })
-        .on('transactionHash', (hash) => {
-          this.setState({ loading: false });
-          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
-            appearance: 'info',
+      setTimeout(async () => {
+        const proofObject = await computeProof(password);
+        await contracts.GardenContract.methods
+          .updateLocationStatusAndGetPayment(
+            gardenId,
+            proofObject.proof.a,
+            proofObject.proof.b,
+            proofObject.proof.c,
+          )
+          .send({ from: account })
+          .on('transactionHash', (hash) => {
+            this.setState({ loading: false });
+            this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+              appearance: 'info',
+            });
+          })
+          .once('confirmation', () => {
+            this.props.updateRents();
+            this.props.toastManager.add(
+              `Transaction confirmée`,
+              {
+                appearance: 'success',
+              },
+            );
           });
-        })
-        .once('confirmation', () => {
-          this.props.updateRents();
-          this.props.toastManager.add(
-            `Transaction confirmée`,
-            {
-              appearance: 'success',
-            },
-          );
-        });
+      }, 10);
     } catch (error) {
       this.props.toastManager.add(
         'Impossible de retirer les éthers, veuillez réessayer',

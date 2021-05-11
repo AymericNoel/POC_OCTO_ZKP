@@ -49,36 +49,38 @@ class AddOfferForm extends Component {
       price,
       radioButton,
     } = this.state;
+    this.setState({ loading: true });
     try {
-      this.setState({ loading: true });
-      const durationInSeconds = radioButton === 1 ? duration * 60 * 60 : duration * 60 * 60 * 24;
-      const proofObject = await computeProof(password);
-      await contracts.GardenContract.methods
-        .proposeGardenOffer(
-          gardenId,
-          tenantAddress,
-          Math.round(durationInSeconds),
-          Web3Utils.getWeiFromEther(price),
-          proofObject.proof.a,
-          proofObject.proof.b,
-          proofObject.proof.c,
-        )
-        .send({ from: account })
-        .on('transactionHash', (hash) => {
-          this.setState({ loading: false });
-          this.props.toastManager.add(`Hash de Tx: ${hash}`, {
-            appearance: 'info',
+      setTimeout(async () => {
+        const durationInSeconds = radioButton === 1 ? duration * 60 * 60 : duration * 60 * 60 * 24;
+        const proofObject = await computeProof(password);
+        await contracts.GardenContract.methods
+          .proposeGardenOffer(
+            gardenId,
+            tenantAddress,
+            Math.round(durationInSeconds),
+            Web3Utils.getWeiFromEther(price),
+            proofObject.proof.a,
+            proofObject.proof.b,
+            proofObject.proof.c,
+          )
+          .send({ from: account })
+          .on('transactionHash', (hash) => {
+            this.setState({ loading: false });
+            this.props.toastManager.add(`Hash de Tx: ${hash}`, {
+              appearance: 'info',
+            });
+          })
+          .once('confirmation', () => {
+            this.props.updateRents();
+            this.props.toastManager.add(
+              'Offre ajoutée avec succès. En attente du paiement du locataire',
+              {
+                appearance: 'success',
+              },
+            );
           });
-        })
-        .once('confirmation', () => {
-          this.props.updateRents();
-          this.props.toastManager.add(
-            'Offre ajoutée avec succès. En attente du paiement du locataire',
-            {
-              appearance: 'success',
-            },
-          );
-        });
+      }, 10);
     } catch (error) {
       this.props.toastManager.add(
         'Impossible de rajouter une offre de location, veuillez réessayer',

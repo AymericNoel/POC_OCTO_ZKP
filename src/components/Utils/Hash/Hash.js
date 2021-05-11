@@ -24,6 +24,7 @@ class Hash extends Component {
           header='Génération de hash de mot passe'
         >
           <MDBInput
+            data-testid='hashInput'
             label='Mot de passe'
             icon='key'
             type='password'
@@ -31,7 +32,7 @@ class Hash extends Component {
             name='preimage'
             onChange={this.changeHandler}
           />
-          <p className='font-weight-bold'>
+          <p className='font-weight-bold' data-testid='hash'>
             Hash :{' '}
             {preimage === ''
               ? ''
