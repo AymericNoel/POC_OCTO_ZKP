@@ -53,7 +53,8 @@ class Owner extends Component {
 
   async fetchData() {
     const contracts = await this.context.contractsPromise;
-    const account = (await this.context.accountsPromise)[0];
+    const accounts = await this.context.accountsPromise;
+    const account = accounts !== (undefined || null) ? accounts[0] : undefined;
     let found = false;
     try {
       const rows = [];
@@ -103,14 +104,14 @@ class Owner extends Component {
     let toDisp;
     if (isEmpty) {
       toDisp = (
-        <h3 className='text-center'>
+        <h3 className='text-center' data-testid='empty-owner-component'>
           Vous n&apos;avez pas encore de jardins, n&apos;hésitez pas à ajouter
           le votre !
         </h3>
       );
     } else {
       toDisp = (
-        <div className='text-center'>
+        <div className='text-center' data-testid='loaded-owner-component'>
           <SectionContainer
             title='Vos jardins'
             className='p-2'

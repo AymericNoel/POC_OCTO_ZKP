@@ -38,7 +38,10 @@ const generateGarden = (id, owner = null) => {
     gardenType: 1,
     district: generateRandomDistrict(),
     area: generateRandomNumber(),
-    secretHash: generateRandomHash(),
+    secretHash: [
+      '20681647278589003737256370945052365463',
+      '289140766284904553191244936235506921461',
+    ],
     contact: generateRandomContact(),
     status: 0,
     rentLength: 0,
@@ -71,13 +74,20 @@ const generateAdminGardenProposal = (id) => {
   return gardenProposal;
 };
 
-const generateGardenArray = (length) => {
+const generateGardenArray = (
+  length,
+  ownerAddress = '',
+  ownershipNumber = 0,
+) => {
   const finalArray = [];
+  let ownership = ownershipNumber;
   for (let i = 1; i <= length; i += 1) {
-    const garden = generateGarden(i);
+    const garden =
+      ownership <= 0 ? generateGarden(i) : generateGarden(i, ownerAddress);
+    ownership -= 1;
     finalArray.push(garden);
   }
-  return finalArray; //et owner specfific
+  return finalArray;
 };
 
 const generateDisputeProposalsArray = (length) => {
