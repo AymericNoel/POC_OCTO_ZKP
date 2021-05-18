@@ -43,7 +43,7 @@ class SideBarNav extends Component {
     const { collapseID, contact } = this.state;
     return (
       <MDBNav className='flex-column'>
-        <div className='adminContact mb-3 w-100'>
+        <div className='adminContact mb-3 w-100' data-testid='admin-contact'>
           <p className='text-center font-weight-bolder'>Admin contact : </p>
           <p className='text-center font-weight-bold'>{contact}</p>
         </div>

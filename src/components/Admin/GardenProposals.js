@@ -125,10 +125,11 @@ class GardenProposals extends Component {
     const { isEmpty, allProposals } = this.state;
     let toDisp;
     if (isEmpty) {
-      toDisp = <h6>Il n&apos;y a pas encore de propositions de jardins.</h6>;
+      toDisp = <h6 data-testid='empty-garden-proposal'>Il n&apos;y a pas encore de propositions de jardins.</h6>;
     } else {
       toDisp = (
         <MDBDataTableV5
+          data-testid='full-garden-proposal'
           infoLabel={['', '-', 'sur', '']}
           entriesLabel='Jardins par page'
           hover

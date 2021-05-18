@@ -50,7 +50,7 @@ class AddDisputeForm extends Component {
         });
     } catch (error) {
       this.props.toastManager.add(
-        'Impossible d&apos;ouvrir un litige, veuillez réessayer',
+        `Impossible d'ouvrir un litige, veuillez réessayer`,
         {
           appearance: 'error',
         },

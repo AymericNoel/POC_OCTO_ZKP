@@ -148,10 +148,11 @@ class DisputeProposals extends Component {
     const { isEmpty, allProposals } = this.state;
     let toDisp;
     if (isEmpty) {
-      toDisp = <h6>Il n&apos;y a pas de litige.</h6>;
+      toDisp = <h6 data-testid='empty-dispute-proposal'>Il n&apos;y a pas de litige.</h6>;
     } else {
       toDisp = (
         <MDBDataTableV5
+          data-testid='full-dispute-proposal'
           infoLabel={['', '-', 'sur', '']}
           entriesLabel='Litiges par page'
           hover

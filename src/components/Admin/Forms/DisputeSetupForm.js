@@ -17,7 +17,8 @@ class DisputeSetupForm extends Component {
 
   async componentDidMount() {
     const contracts = await this.context.contractsPromise;
-    const account = (await this.context.accountsPromise)[0];
+    const accounts = await this.context.accountsPromise;
+    const account = accounts !== undefined ? accounts[0] : undefined;
 
     this.setState({ contracts, account });
   }
