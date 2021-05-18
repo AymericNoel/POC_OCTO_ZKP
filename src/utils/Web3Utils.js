@@ -4,6 +4,8 @@ import GardenContract from '../contracts/GardenManager.json';
 
 const getAccounts = (_web3) => _web3.eth.getAccounts();
 
+const getNetworkType = (_web3) => _web3.eth.net.getNetworkType();
+
 const getEtherFromWei = (WeiAmount) => Number(Web3.utils.fromWei(WeiAmount));
 
 const getWeiFromEther = (string) => Web3.utils.toWei(string.toString());
@@ -39,7 +41,9 @@ const metamaskRefresh = () => {
       window.location.reload();
     });
     /* eslint no-console: "off" */
-  } catch (error) { console.log('cant connect to window.ethereum.'); }
+  } catch (error) {
+    console.log('cant connect to window.ethereum.');
+  }
 };
 
 const getWeb3 = () => {
@@ -65,6 +69,7 @@ const Web3Utils = {
   getWeb3,
   getEtherFromWei,
   getWeiFromEther,
+  getNetworkType,
 };
 
 export default Web3Utils;

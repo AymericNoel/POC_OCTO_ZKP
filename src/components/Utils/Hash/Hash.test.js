@@ -1,5 +1,6 @@
 const { render, screen, fireEvent } = require('@testing-library/react');
 import Hash from './Hash';
+import React from 'react';
 import { HashUtils } from '../../../utils/HashUtils';
 
 describe('Hash components', () => {
@@ -8,6 +9,7 @@ describe('Hash components', () => {
     const retrievedContent = screen.getByTestId('hash');
     expect(retrievedContent).toHaveTextContent('Hash :');
   });
+  
   test('Should calculates the correct hash', () => {
     render(<Hash />);
     const inputContent = screen.getByTestId('hashInput');

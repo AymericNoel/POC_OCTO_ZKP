@@ -69,14 +69,14 @@ class Dashboard extends Component {
     let toDisp;
     if (isEmpty) {
       toDisp = (
-        <h4>
+        <h4 data-testid='empty-dashboard'>
           Il n&apos;y a pas encore de jardins sur la plateforme, soyez le
           premier à <Link to='/owner'>créer le votre</Link> !
         </h4>
       );
     } else {
       toDisp = (
-        <div>
+        <div data-testid='loaded-dashboard'>
           <p>Jardins sur la plateforme : {gardenCount}</p>
           <p style={{ marginBottom: '2em' }}>
             Jardins en locations : {locations}

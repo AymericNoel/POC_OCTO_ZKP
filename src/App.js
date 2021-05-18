@@ -27,8 +27,7 @@ import Web3Utils from './utils/Web3Utils';
 function ConnectButton(props) {
   const { onClick } = props;
   return (
-    <MDBBtn color='dark-green' onClick={onClick} size='sm'>
-      {/* <i class="fa-metamask mr-1"/>  Connect Metamask */}
+    <MDBBtn color='dark-green' onClick={onClick} size='sm' data-testid='metamask-connection-button'>
       <MDBIcon icon='magic' className='mr-1' />
       Connection Metamask
     </MDBBtn>
@@ -46,6 +45,7 @@ function ConnectedButton(props) {
         color='success'
         href={`https://${network}etherscan.io/address/${address}`}
         target='blank'
+        data-testid='metamask-connected-button'
       >
         <MDBIcon icon='magic' className='mr-1' />
         Connecté
@@ -72,7 +72,7 @@ class App extends Component {
 
   async componentDidMount() {
     const web3 = Web3Utils.getWeb3();
-    const network = await web3.eth.net.getNetworkType();
+    const network = await Web3Utils.getNetworkType(web3);
     const accounts = await Web3Utils.getAccounts(web3);
     if (accounts.length === 0) {
       this.setState({ isLoggedIn: false, network });
