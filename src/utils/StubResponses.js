@@ -1,4 +1,3 @@
-import { HashUtils } from './HashUtils';
 const RandExp = require('randexp');
 
 const generateRandomDistrict = (length = 8) => {
@@ -13,23 +12,19 @@ const generateRandomDistrict = (length = 8) => {
   return result.join('');
 };
 
-const generateRandomNumber = (max = 501) => {
-  return Math.floor(Math.random() * max);
+const generateRandomNumber = (min = 0, max = 501) => {
+  return Math.floor(Math.random() * max) + min;
 };
 
 const generateRandomContact = () => {
   return new RandExp(/^[a-zA-z0-9]{7}@gmail.com$/).gen();
 };
 
-const generateRandomHash = () => {
-  return HashUtils.hashWithoutInputPadding('test');
-};
-
 const generateRandomEthereumAddress = () => {
   return new RandExp(/^0x[a-fA-F0-9]{40}$/).gen();
 };
 
-const generateGarden = (id, owner = null) => {
+const generateGarden = (id = 0, owner = null, status = 0, rentLength = 0) => {
   const gardenProposal = {
     id,
     owner: owner === null ? generateRandomEthereumAddress() : owner,
@@ -43,14 +38,28 @@ const generateGarden = (id, owner = null) => {
       '289140766284904553191244936235506921461',
     ],
     contact: generateRandomContact(),
-    status: 0,
-    rentLength: 0,
+    status,
+    rentLength,
+    rents: null,
   };
   return gardenProposal;
 };
 
+const generateRent = (duration = null, tenant = null, signature = null) => {
+  const balanceWeiUnit = generateRandomNumber(100000, 40000000000).toString();
+  const rent = {
+    rate: generateRandomNumber(-1, 5),
+    price: balanceWeiUnit,
+    balance: balanceWeiUnit,
+    tenant: tenant ?? 'valid_address',
+    duration: duration ?? generateRandomNumber(5000, 500000),
+    signature: signature ?? 'valid_signature',
+  };
+  return rent;
+};
+
 const generateDisputeProposal = (id) => {
-  const balanceWeiUnit = generateRandomNumber(40000000000) + 100000;
+  const balanceWeiUnit = generateRandomNumber(100000, 40000000000);
   const disputeProposal = {
     id,
     acceptProposal: [generateRandomEthereumAddress()],
@@ -74,16 +83,31 @@ const generateAdminGardenProposal = (id) => {
   return gardenProposal;
 };
 
+const generateRentArray = (length, tenantAddress = '', tenantCount = 0) => {
+  const finalArray = [];
+  let rentNumber = tenantCount;
+  for (let i = 0; i < length; i += 1) {
+    const rent =
+      rentNumber <= 0 ? generateRent() : generateRent(undefined, tenantAddress);
+    rentNumber -= 1;
+    finalArray.push(rent);
+  }
+  return finalArray;
+};
+
 const generateGardenArray = (
   length,
   ownerAddress = '',
   ownershipNumber = 0,
+  rentLength = 0,
 ) => {
   const finalArray = [];
   let ownership = ownershipNumber;
   for (let i = 1; i <= length; i += 1) {
     const garden =
-      ownership <= 0 ? generateGarden(i) : generateGarden(i, ownerAddress);
+      ownership <= 0
+        ? generateGarden(i, undefined, undefined, rentLength)
+        : generateGarden(i, ownerAddress, undefined, rentLength);
     ownership -= 1;
     finalArray.push(garden);
   }
@@ -112,4 +136,6 @@ export {
   generateGardenArray,
   generateDisputeProposalsArray,
   generateAdminGardenProposalsArray,
+  generateGarden,
+  generateRentArray,
 };

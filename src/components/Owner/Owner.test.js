@@ -37,7 +37,7 @@ function web3StubResponse(gardens = []) {
   return contractsPromise;
 }
 
-describe('Dashboard component', () => {
+describe('Owner component', () => {
   afterEach(cleanup);
 
   test('Should not display empty elements if ethereum send back gardens that belong to owner', async () => {

@@ -128,7 +128,7 @@ class RentsDatatable extends Component {
             status,
             price: `${Web3Utils.getEtherFromWei(rent.price)} ETH`,
             balance: `${Web3Utils.getEtherFromWei(rent.balance)} ETH`,
-            rate: rate !== -1 ? rate : 'Non noté',
+            rate: rate !== -1 ? `${rate}/5` : 'Non noté',
             seeMore:
               this.props.seeMore === true ? (
                 <button
@@ -174,10 +174,10 @@ class RentsDatatable extends Component {
     const { isEmpty, allRents, modal, gardenInfo, gardenId } = this.state;
     let toDisp;
     if (isEmpty) {
-      toDisp = <h6>Il n&apos;y a pas de locations pour ce jardin.</h6>;
+      toDisp = <h6 data-testid='empty-rents'>Il n&apos;y a pas de locations pour ce jardin.</h6>;
     } else {
       toDisp = (
-        <div>
+        <div data-testid='full-rents'>
           <MDBDataTableV5
             infoLabel={['', '-', 'sur', '']}
             entriesLabel='Locations par page'

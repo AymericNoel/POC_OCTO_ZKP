@@ -82,7 +82,8 @@ class TenantDatatable extends Component {
 
   async fetchData() {
     const contracts = await this.context.contractsPromise;
-    const account = (await this.context.accountsPromise)[0];
+    const accounts = await this.context.accountsPromise;
+    const account = accounts !== (undefined || null) ? accounts[0] : undefined;
     let found = false;
     try {
       const gardenCount = await contracts.GardenContract.methods
@@ -133,7 +134,7 @@ class TenantDatatable extends Component {
                   price: `${Web3Utils.getEtherFromWei(lastRent.price)} ETH`,
                   balance: `${Web3Utils.getEtherFromWei(lastRent.balance)} ETH`,
                   hash: <p style={{ fontSize: '9px' }}>{gardenHashedCode}</p>,
-                  rate: rate !== -1 ? rate : 'Non noté',
+                  rate: rate !== -1 ? `${rate}/5` : 'Non noté',
                   seeMore: (
                     <button
                       style={{
@@ -181,14 +182,14 @@ class TenantDatatable extends Component {
     let toDisp;
     if (isEmpty) {
       toDisp = (
-        <h6>
+        <h6 data-testid='empty-tenant-datatable'>
           Vous n&apos;avez pas de locations en cours. Contactez un propriétaire
           pour effectuer une location.
         </h6>
       );
     } else {
       toDisp = (
-        <div>
+        <div data-testid='full-tenant-datatable'>
           <MDBDataTableV5
             infoLabel={['', '-', 'sur', '']}
             entriesLabel='Locations par page'

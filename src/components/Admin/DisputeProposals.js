@@ -91,7 +91,7 @@ class DisputeProposals extends Component {
               </MDBBadge>
             ),
             accepts: disputeProposal.acceptProposal.map((accept) => (
-              <MDBRow className='my-0' style={{ fontSize: '9px' }}>
+              <MDBRow className='my-0' style={{ fontSize: '9px' }} key={accept}>
                 {accept}
               </MDBRow>
             )),

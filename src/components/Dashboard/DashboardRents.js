@@ -13,7 +13,7 @@ function DashboardRents(props) {
         title={`Jardin n° ${gardenId}`}
         className='p-2'
       >
-        <RentsDatatable gardenId={gardenId} />
+        <RentsDatatable gardenId={gardenId} seeMore />
       </SectionContainer>
     </MDBContainer>
   );
