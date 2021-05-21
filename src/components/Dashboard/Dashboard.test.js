@@ -41,8 +41,8 @@ function web3StubResponse(gardens = []) {
 describe('Dashboard component', () => {
   afterEach(cleanup);
 
-  test('Should not display empty element if ethereum send back gardens', async () => {
-    const gardensStub = generateGardenArray(2);
+  test('Should display correct gardens retrieved from blockchain', async () => {
+    const gardensStub = generateGardenArray(7);
     const contractsPromise = web3StubResponse(gardensStub);
 
     render(
@@ -56,19 +56,21 @@ describe('Dashboard component', () => {
     );
 
     await waitFor(() => screen.getByTestId('loaded-dashboard'));
-    const retrievedContent = screen.getByTestId('loaded-dashboard');
-    expect(retrievedContent).toBeVisible();
-    expect(retrievedContent).toBeInTheDocument();
+    const fullRetrievedDashboard = screen.getByTestId('loaded-dashboard');
+
+    expect(fullRetrievedDashboard).toBeVisible();
+    expect(fullRetrievedDashboard).toBeInTheDocument();
+
     gardensStub.forEach((garden) => {
-      expect(retrievedContent).toHaveTextContent(`Jardin n°${garden.id}`);
-      expect(retrievedContent).toHaveTextContent(garden.area);
-      expect(retrievedContent).toHaveTextContent(garden.district);
-      expect(retrievedContent).toHaveTextContent(garden.contact);
+      expect(fullRetrievedDashboard).toHaveTextContent(`Jardin n°${garden.id}`);
+      expect(fullRetrievedDashboard).toHaveTextContent(garden.area);
+      expect(fullRetrievedDashboard).toHaveTextContent(garden.district);
+      expect(fullRetrievedDashboard).toHaveTextContent(garden.contact);
     });
-    expect(retrievedContent).toHaveTextContent(`Jardins sur la plateforme : ${gardensStub.length}`);
+    expect(fullRetrievedDashboard).toHaveTextContent(`Jardins sur la plateforme : ${gardensStub.length}`);
   });
 
-  test('Should display empty element and error toaster if contractsPromise context is null', async () => {
+  test('Should display empty tag element and show error toaster if contractsPromise context is null', async () => {
     const contractsPromise = null;
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
@@ -86,10 +88,12 @@ describe('Dashboard component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-dashboard'));
-    const retrievedContent = screen.getByTestId('empty-dashboard');
+    const emptyRetrievedDashboard = screen.getByTestId('empty-dashboard');
     const retrievedToaster = screen.getByTestId('toastContainer');
-    expect(retrievedContent).toBeVisible();
-    expect(retrievedContent).toBeInTheDocument();
+
+    expect(emptyRetrievedDashboard).toBeVisible();
+    expect(emptyRetrievedDashboard).toBeInTheDocument();
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).toHaveTextContent(
@@ -97,7 +101,7 @@ describe('Dashboard component', () => {
     );
   });
 
-  test('Should display empty element if there is no garden on blockchain', async () => {
+  test('Should display empty tag element without error toaster if there is no garden on blockchain', async () => {
     const contractsPromise = web3StubResponse();
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
@@ -115,10 +119,12 @@ describe('Dashboard component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-dashboard'));
-    const retrievedContent = screen.getByTestId('empty-dashboard');
+    const emptyRetrievedDashboard = screen.getByTestId('empty-dashboard');
     const retrievedToaster = screen.getByTestId('toastContainer');
-    expect(retrievedContent).toBeVisible();
-    expect(retrievedContent).toBeInTheDocument();
+
+    expect(emptyRetrievedDashboard).toBeVisible();
+    expect(emptyRetrievedDashboard).toBeInTheDocument();
+
     expect(retrievedToaster).toHaveTextContent('');
     expect(retrievedToaster).not.toHaveTextContent(
       'Impossible de récupérer les données depuis la blockchain',

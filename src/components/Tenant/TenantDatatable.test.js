@@ -1,18 +1,15 @@
 const { render, screen, cleanup, waitFor } = require('@testing-library/react');
 import TenantDatatable from './TenantDatatable';
-import {
-  ToastProvider,
-  DefaultToastContainer,
-} from 'react-toast-notifications';
+import { ToastProvider, DefaultToastContainer } from 'react-toast-notifications';
 import React from 'react';
 import BlockchainContext from '../../context/BlockchainContext';
 import {
-  generateGarden,
   generateGardenArray,
   generateRentArray,
+  extractRentHashesFromGardenArray,
 } from '../../utils/StubResponses';
 
-function web3StubResponse(gardensAndRents = []) {
+function web3StubResponse(gardens = []) {
   const methods = {
     lastCall: 0,
     lastRentId: 0,
@@ -36,16 +33,13 @@ function web3StubResponse(gardensAndRents = []) {
       let returnValue;
       switch (this.lastCall) {
         case 1:
-          returnValue = gardensAndRents[this.lastGardenId - 1];
+          returnValue = gardens[this.lastGardenId - 1];
           break;
         case 2:
-          returnValue =
-            gardensAndRents[this.lastGardenId - 1].rents[
-              this.lastRentId
-            ];
+          returnValue = gardens[this.lastGardenId - 1].rents[this.lastRentId];
           break;
         case 3:
-          returnValue = gardensAndRents.length;
+          returnValue = gardens.length;
           break;
         default:
           break;
@@ -67,12 +61,13 @@ function web3StubResponse(gardensAndRents = []) {
 describe('TenantDatatable component', () => {
   afterEach(cleanup);
 
-  test('Should display empty elements and show error toaster if contractsPromise context is null', async () => {
+  test('Should display empty tag element and show error toaster if contractsPromise context is null', async () => {
     const contractsPromise = null;
     const tenantAddress = '0xC8f56f654eB18560718B4012497122CC9A9E898f';
     const accountsPromise = new Promise((resolve) => {
       resolve([tenantAddress]);
     });
+
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
     );
@@ -88,11 +83,12 @@ describe('TenantDatatable component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-tenant-datatable'));
-    const retrievedRentsContent = screen.getByTestId('empty-tenant-datatable');
+    const emptyRetrievedRents = screen.getByTestId('empty-tenant-datatable');
     const retrievedToaster = screen.getByTestId('toastContainer');
 
-    expect(retrievedRentsContent).toBeVisible();
-    expect(retrievedRentsContent).toBeInTheDocument();
+    expect(emptyRetrievedRents).toBeVisible();
+    expect(emptyRetrievedRents).toBeInTheDocument();
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).toHaveTextContent(
@@ -100,19 +96,22 @@ describe('TenantDatatable component', () => {
     );
   });
 
-  test('Should display empty elements if accountsPromise context is null', async () => {
-    const rentLength = 5;
-    const gardensWithRents = generateGardenArray(
-      4,
+  test('Should display empty tag element if accountsPromise context is null', async () => {
+    const allGardens = 6;
+    const rentsByGarden = 5;
+    const StubGardensWithRents = generateGardenArray(
+      allGardens,
       undefined,
       undefined,
-      rentLength,
+      rentsByGarden,
     ).map((garden) => {
       garden.rents = generateRentArray(garden.rentLength);
       return garden;
     });
-    const contractsPromise = web3StubResponse(gardensWithRents);
+
+    const contractsPromise = web3StubResponse(StubGardensWithRents);
     const accountsPromise = null;
+
     render(
       <BlockchainContext.Provider value={{ contractsPromise, accountsPromise }}>
         <ToastProvider>
@@ -122,18 +121,19 @@ describe('TenantDatatable component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-tenant-datatable'));
-    const retrievedRentsContent = screen.getByTestId('empty-tenant-datatable');
+    const emptyRetrievedRents = screen.getByTestId('empty-tenant-datatable');
 
-    expect(retrievedRentsContent).toBeVisible();
-    expect(retrievedRentsContent).toBeInTheDocument();
+    expect(emptyRetrievedRents).toBeVisible();
+    expect(emptyRetrievedRents).toBeInTheDocument();
   });
 
-  test('Should display empty elements without error toaster if there is no garden on blockchain', async () => {
+  test('Should display empty tag element without error toaster if there is no garden on blockchain', async () => {
     const contractsPromise = web3StubResponse();
     const tenantAddress = '0xC8f56f654eB18560718B4012497122CC9A9E898f';
     const accountsPromise = new Promise((resolve) => {
       resolve([tenantAddress]);
     });
+
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
     );
@@ -149,10 +149,12 @@ describe('TenantDatatable component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-tenant-datatable'));
-    const retrievedRentsContent = screen.getByTestId('empty-tenant-datatable');
+    const emptyRetrievedRents = screen.getByTestId('empty-tenant-datatable');
     const retrievedToaster = screen.getByTestId('toastContainer');
-    expect(retrievedRentsContent).toBeVisible();
-    expect(retrievedRentsContent).toBeInTheDocument();
+
+    expect(emptyRetrievedRents).toBeVisible();
+    expect(emptyRetrievedRents).toBeInTheDocument();
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).not.toHaveTextContent(
@@ -161,22 +163,25 @@ describe('TenantDatatable component', () => {
     expect(retrievedToaster).toHaveTextContent('');
   });
 
-  test('Should display empty elements without error toaster if there is no location for current user', async () => {
-    const rentLength = 5;
-    const gardensWithRents = generateGardenArray(
-      4,
+  test('Should display empty tag element without error toaster if there is no location for current user', async () => {
+    const allGardens = 6;
+    const rentsByGarden = 5;
+    const StubGardensWithRents = generateGardenArray(
+      allGardens,
       undefined,
       undefined,
-      rentLength,
+      rentsByGarden,
     ).map((garden) => {
       garden.rents = generateRentArray(garden.rentLength);
       return garden;
     });
-    const contractsPromise = web3StubResponse(gardensWithRents);
+
+    const contractsPromise = web3StubResponse(StubGardensWithRents);
     const tenantAddress = '0xC8f56f654eB18560718B4012497122CC9A9E898f';
     const accountsPromise = new Promise((resolve) => {
       resolve([tenantAddress]);
     });
+
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
     );
@@ -192,10 +197,12 @@ describe('TenantDatatable component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-tenant-datatable'));
-    const retrievedRentsContent = screen.getByTestId('empty-tenant-datatable');
+    const emptyRetrievedRents = screen.getByTestId('empty-tenant-datatable');
     const retrievedToaster = screen.getByTestId('toastContainer');
-    expect(retrievedRentsContent).toBeVisible();
-    expect(retrievedRentsContent).toBeInTheDocument();
+
+    expect(emptyRetrievedRents).toBeVisible();
+    expect(emptyRetrievedRents).toBeInTheDocument();
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).not.toHaveTextContent(
@@ -204,27 +211,27 @@ describe('TenantDatatable component', () => {
     expect(retrievedToaster).toHaveTextContent('');
   });
 
-  test('Should display correct rents for user', async () => {
-    const rentLengthByGarden = 5;
-    const tenantsRents = 3;
+  test('Should display correct rents for specific tenant', async () => {
+    const allGardens = 2;
+    const rentsByGarden = 5;
+    const rentsByTenantInEachGarden = 3;
     const tenantAddress = '0xC8f56f654eB18560718B4012497122CC9A9E898f';
+
+    const StubGardensWithRents = generateGardenArray(
+      allGardens,
+      undefined,
+      undefined,
+      rentsByGarden,
+    ).map((garden) => {
+      garden.rents = generateRentArray(garden.rentLength, tenantAddress, rentsByTenantInEachGarden);
+      return garden;
+    });
+
+    const contractsPromise = web3StubResponse(StubGardensWithRents);
     const accountsPromise = new Promise((resolve) => {
       resolve([tenantAddress]);
     });
-    const gardensWithRents = generateGardenArray(
-      6,
-      undefined,
-      undefined,
-      rentLengthByGarden,
-    ).map((garden) => {
-      garden.rents = generateRentArray(
-        garden.rentLength,
-        tenantAddress,
-        tenantsRents,
-      );
-      return garden;
-    });
-    const contractsPromise = web3StubResponse(gardensWithRents);
+
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
     );
@@ -242,8 +249,23 @@ describe('TenantDatatable component', () => {
     await waitFor(() => screen.getByTestId('full-tenant-datatable'));
     const retrievedRentsContent = screen.getByTestId('full-tenant-datatable');
     const retrievedToaster = screen.getByTestId('toastContainer');
+
     expect(retrievedRentsContent).toBeVisible();
     expect(retrievedRentsContent).toBeInTheDocument();
+
+    StubGardensWithRents.forEach((garden) => {
+      const rents = garden.rents;
+
+      rents.forEach((rent) => {
+        if (rent.tenant === tenantAddress) {
+          expect(retrievedRentsContent).toHaveTextContent(rent.gardenHashCode);
+        } else {
+          expect(retrievedRentsContent).not.toHaveTextContent(rent.gardenHashCode);
+        }
+      });
+
+    });
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).not.toHaveTextContent(

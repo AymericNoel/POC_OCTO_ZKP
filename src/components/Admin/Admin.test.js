@@ -97,15 +97,18 @@ describe('Admin component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-garden-proposal'));
-    const retrievedGardenContent = screen.getByTestId('empty-garden-proposal');
-    const retrievedDisputeContent = screen.getByTestId(
+    const emptyRetrievedGardenProposals = screen.getByTestId('empty-garden-proposal');
+    const emptyRetrievedDisputeProposals = screen.getByTestId(
       'empty-dispute-proposal',
     );
     const retrievedToaster = screen.getByTestId('toastContainer');
-    expect(retrievedGardenContent).toBeVisible();
-    expect(retrievedGardenContent).toBeInTheDocument();
-    expect(retrievedDisputeContent).toBeVisible();
-    expect(retrievedDisputeContent).toBeInTheDocument();
+
+    expect(emptyRetrievedGardenProposals).toBeVisible();
+    expect(emptyRetrievedGardenProposals).toBeInTheDocument();
+
+    expect(emptyRetrievedDisputeProposals).toBeVisible();
+    expect(emptyRetrievedDisputeProposals).toBeInTheDocument();
+
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).toHaveTextContent(
@@ -119,7 +122,7 @@ describe('Admin component', () => {
     );
   });
 
-  test('Should display empty datatables for disputes and gardens if there is no garden or dispute on blockchain without errors', async () => {
+  test('Should display empty datatables without errors for disputes and gardens if there is no garden or dispute on blockchain', async () => {
     const contractsPromise = web3StubResponse();
     const MyCustomToastContainer = (props) => (
       <DefaultToastContainer {...props} data-testid='toastContainer' />
@@ -136,16 +139,17 @@ describe('Admin component', () => {
     );
 
     await waitFor(() => screen.getByTestId('empty-garden-proposal'));
-    const retrievedGardenContent = screen.getByTestId('empty-garden-proposal');
-    const retrievedDisputeContent = screen.getByTestId(
+    const emptyRetrievedGardenProposals = screen.getByTestId('empty-garden-proposal');
+    const emptyRetrievedDisputeProposals = screen.getByTestId(
       'empty-dispute-proposal',
     );
     const retrievedToaster = screen.getByTestId('toastContainer');
 
-    expect(retrievedGardenContent).toBeVisible();
-    expect(retrievedGardenContent).toBeInTheDocument();
-    expect(retrievedDisputeContent).toBeVisible();
-    expect(retrievedDisputeContent).toBeInTheDocument();
+    expect(emptyRetrievedGardenProposals).toBeVisible();
+    expect(emptyRetrievedGardenProposals).toBeInTheDocument();
+    
+    expect(emptyRetrievedDisputeProposals).toBeVisible();
+    expect(emptyRetrievedDisputeProposals).toBeInTheDocument();
 
     expect(retrievedToaster).toBeVisible();
     expect(retrievedToaster).toBeInTheDocument();
@@ -186,18 +190,17 @@ describe('Admin component', () => {
     expect(retrievedAdminContact).toHaveTextContent('admin@contact.fr');
 
     expect(retrievedToaster).toBeVisible();
-    expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).not.toHaveTextContent(
       'Impossible de récupérer le contact "administrateur"',
     );
   });
 
   test('Should display datatables with correct elements for disputes and gardens', async () => {
-    const disputeProposals = generateDisputeProposalsArray(2);
-    const gardenProposals = generateAdminGardenProposalsArray(6);
+    const stubDisputeProposals = generateDisputeProposalsArray(2);
+    const stubGardenProposals = generateAdminGardenProposalsArray(6);
     const contractsPromise = web3StubResponse(
-      gardenProposals,
-      disputeProposals,
+      stubGardenProposals,
+      stubDisputeProposals,
       'admin@contact.org',
     );
 
@@ -216,26 +219,25 @@ describe('Admin component', () => {
     );
 
     await waitFor(() => screen.getByTestId('full-garden-proposal'));
-    const retrievedGardenContent = screen.getByTestId('full-garden-proposal');
-    const retrievedDisputeContent = screen.getByTestId('full-dispute-proposal');
+    const fullRetrievedGardenProposals = screen.getByTestId('full-garden-proposal');
+    const fullRetrievedDisputeProposals = screen.getByTestId('full-dispute-proposal');
     const retrievedToaster = screen.getByTestId('toastContainer');
 
-    expect(retrievedGardenContent).toBeVisible();
-    expect(retrievedGardenContent).toBeInTheDocument();
-    gardenProposals.forEach((garden) => {
-      expect(retrievedGardenContent).toHaveTextContent(`n° ${garden.id}`);
+    expect(fullRetrievedGardenProposals).toBeVisible();
+    expect(fullRetrievedGardenProposals).toBeInTheDocument();
+    stubGardenProposals.forEach((garden) => {
+      expect(fullRetrievedGardenProposals).toHaveTextContent(`n° ${garden.id}`);
     });
 
-    expect(retrievedDisputeContent).toBeVisible();
-    expect(retrievedDisputeContent).toBeInTheDocument();
-    disputeProposals.forEach((dispute) => {
-      expect(retrievedDisputeContent).toHaveTextContent(`Litige n° ${dispute.id}`);
-      expect(retrievedDisputeContent).toHaveTextContent(dispute.acceptProposal[0]);
+    expect(fullRetrievedDisputeProposals).toBeVisible();
+    expect(fullRetrievedDisputeProposals).toBeInTheDocument();
+    stubDisputeProposals.forEach((dispute) => {
+      expect(fullRetrievedDisputeProposals).toHaveTextContent(`Litige n° ${dispute.id}`);
+      expect(fullRetrievedDisputeProposals).toHaveTextContent(dispute.acceptProposal[0]);
     });
     
 
     expect(retrievedToaster).toBeVisible();
-    expect(retrievedToaster).toBeInTheDocument();
     expect(retrievedToaster).not.toHaveTextContent(
       'Impossible de récupérer les propositions de jardins depuis la blockchain',
     );
