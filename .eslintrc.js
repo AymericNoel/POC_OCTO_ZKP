@@ -27,6 +27,7 @@ module.exports = {
     'quotes': "off",
     'import/no-extraneous-dependencies': "off",
     'object-curly-newline': "off",
-    'react/jsx-props-no-spreading': [1, {"custom": "ignore"}]
+    'react/jsx-props-no-spreading': [1, {"custom": "ignore"}],
+    'no-unused-expressions': [2, { "allowTernary": true }]
   },
 };

@@ -3,11 +3,7 @@ import TenantDatatable from './TenantDatatable';
 import { ToastProvider, DefaultToastContainer } from 'react-toast-notifications';
 import React from 'react';
 import BlockchainContext from '../../context/BlockchainContext';
-import {
-  generateGardenArray,
-  generateRentArray,
-  extractRentHashesFromGardenArray,
-} from '../../utils/StubResponses';
+import { generateGardenArray, generateRentArray } from '../../utils/StubResponses';
 
 function web3StubResponse(gardens = []) {
   const methods = {
@@ -105,8 +101,9 @@ describe('TenantDatatable component', () => {
       undefined,
       rentsByGarden,
     ).map((garden) => {
-      garden.rents = generateRentArray(garden.rentLength);
-      return garden;
+      const gardenWithRents = garden;
+      gardenWithRents.rents = generateRentArray(garden.rentLength);
+      return gardenWithRents;
     });
 
     const contractsPromise = web3StubResponse(StubGardensWithRents);
@@ -172,8 +169,9 @@ describe('TenantDatatable component', () => {
       undefined,
       rentsByGarden,
     ).map((garden) => {
-      garden.rents = generateRentArray(garden.rentLength);
-      return garden;
+      const gardenWithRents = garden;
+      gardenWithRents.rents = generateRentArray(garden.rentLength);
+      return gardenWithRents;
     });
 
     const contractsPromise = web3StubResponse(StubGardensWithRents);
@@ -223,8 +221,13 @@ describe('TenantDatatable component', () => {
       undefined,
       rentsByGarden,
     ).map((garden) => {
-      garden.rents = generateRentArray(garden.rentLength, tenantAddress, rentsByTenantInEachGarden);
-      return garden;
+      const gardenWithRents = garden;
+      gardenWithRents.rents = generateRentArray(
+        garden.rentLength,
+        tenantAddress,
+        rentsByTenantInEachGarden,
+      );
+      return gardenWithRents;
     });
 
     const contractsPromise = web3StubResponse(StubGardensWithRents);
@@ -263,7 +266,6 @@ describe('TenantDatatable component', () => {
           expect(retrievedRentsContent).not.toHaveTextContent(rent.gardenHashCode);
         }
       });
-
     });
 
     expect(retrievedToaster).toBeVisible();
